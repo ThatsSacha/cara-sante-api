@@ -2,34 +2,37 @@
 
 namespace App\Service;
 
-use App\Entity\Users;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use App\Entity\Users;
+use App\Repository\UsersRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UsersService {
-    private $denormalizer;
-    private $emi;
+class UsersService extends AbstractRestService {
+    private $passwordHasher;
 
-    public function __construct(DenormalizerInterface $denormalizer, EntityManagerInterface $emi) {
-        $this->denormalizer = $denormalizer;
-        $this->emi = $emi;
+    public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher) {
+        parent::__construct($repository, $emi, $denormalizer);
+
+        $this->passwordHasher = $passwordHasher;
     }
 
-    public function create(array $data) {
+    /**
+     * @param array $data
+     * 
+     * @return array
+     */
+    public function new(array $data): array {
         try {
             $mandatory = ['email', 'password'];
             $this->verifyMandatoryFields($mandatory, $data);
             $this->verifyMailFormat($data['email']);
+            $data['password'] = $this->passwordHasher->hashPassword(new Users, $data['password']);
+            $user = $this->create($data);
 
-            //$this->userPasswordHasher->hashPassword(
-            $user = $this->denormalizer->denormalize($data, Users::class);
-                $this->emi->persist($user);
-                $this->emi->flush();
-
-            return array(
-                'status' => 201
-            );
+            return $user->jsonSerialize();
         } catch (Exception $e) {
             return array(
                 'status' => 400,
@@ -44,6 +47,10 @@ class UsersService {
         }
     }
 
+    /**
+     * @param array $mandatoryFields
+     * @param array $data
+     */
     public function verifyMandatoryFields(array $mandatoryFields, array $data): array {
         $error = array();
 
@@ -56,6 +63,11 @@ class UsersService {
         return count($error) > 0 ? $this->throwError($error) : [];
     }
 
+    /**
+     * @param array $errors
+     * 
+     * @throws Exception
+     */
     public function throwError(array $errors) {
         if (count($errors) > 0) {
             $error = implode(', ', $errors);

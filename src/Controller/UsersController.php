@@ -6,13 +6,14 @@ use App\Entity\Users;
 use App\Form\UsersType;
 use App\Service\UsersService;
 use App\Repository\UsersRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-#[Route('/users')]
+#[Route('/api/users')]
 class UsersController extends AbstractController
 {
     private $usersService;
@@ -31,32 +32,22 @@ class UsersController extends AbstractController
     }
 
     #[Route('', name: 'users_new', methods: ['OPTIONS', 'POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits pour créer un utilisateur')]
     public function new(Request $request): JsonResponse
     {
         if ($request->getContentType() === 'json') {
             $data = json_decode($request->getContent(), true);
         }
         
-        $create = $this->usersService->create($data);
+        $create = $this->usersService->new($data);
 
-        return new JsonResponse($create, $create['status']);
-
-        /*$user = new Users();
-        $form = $this->createForm(UsersType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('users_index', [], Response::HTTP_SEE_OTHER);
+        if (!isset($create['status'])) {
+            $status = 201;
+        } else {
+            $status = $create['status'];
         }
 
-        return $this->renderForm('users/new.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);*/
+        return new JsonResponse($create, $status);
     }
 
     #[Route('/{id}', name: 'users_show', methods: ['GET'])]
