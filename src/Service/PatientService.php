@@ -36,7 +36,7 @@ class PatientService extends AbstractRestService {
 
                 foreach($foundPatients as $patient) {
                     $patientSerialized = $patient->jsonSerialize();
-                    $existingPatients[$patientSerialized['mail']] = $patient;
+                    $existingPatients[$patientSerialized['mail']][] = $patient;
                 }
 
                 foreach($patients as $patient) {
@@ -57,10 +57,12 @@ class PatientService extends AbstractRestService {
                         $this->create($patientObject);
                     }
                 }
+            } else {
+                $this->parseCsvService->writeToResult($patients);
             }
 
             return array(
-                'status' => 200
+                'status' => 201
             );
         } catch (Exception $e) {
             return array(
@@ -70,20 +72,29 @@ class PatientService extends AbstractRestService {
         }
     }
 
+    /**
+     * @param array $patient
+     * @param array $existingPatients
+     * 
+     * @return bool
+     */
     public function isPatientTestExists(array $patient, array $existingPatients): bool {
-        dd($existingPatients[$patient['mail']]);
-        // get all $existingPatients where $patient['mail'] = $existingPatients['mail']
-
-        /*$patient = $this->findBy(array(
-            'mail' => $patient['mail'],
-            'testedAt' => date_create($patient['testedAt'])
-        ));
-
-        if (count($patient) > 0) {
-            return true;
+        if (isset($existingPatients[$patient['mail']])) {
+            $existingTests = $existingPatients[$patient['mail']];
+        
+            if (count($existingTests) > 0) {
+                foreach($existingTests as $existingTest) {
+                    $existingTestDate = strtotime(date_format($existingTest->getTestedAt(), 'Y-m-d H:i:s'));
+                    $patientTestDate = strtotime(date_format(date_create($patient['testedAt']), 'Y-m-d H:i:s'));
+    
+                    if ($existingTestDate === $patientTestDate) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        return false;*/
+        return false;
     }
 
     /**

@@ -80,7 +80,18 @@ class Patient
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
-            'mail' => $this->getMail()
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'mail' => $this->getMail(),
+            'phone' => $this->getPhone(),
+            'birth' => $this->getBirth(),
+            'street' => $this->getStreet(),
+            'zip' => $this->getZip(),
+            'city' => $this->getCity(),
+            'nir' => $this->getNir(),
+            'testedAt' => $this->getTestedAt(),
+            'isFilled' => $this->getIsFilled(),
+            'isInvoiced' => $this->getIsInvoiced()
         );
     }
 

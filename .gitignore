@@ -24,4 +24,4 @@
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
-./uploads/csv/*
+public/uploads/csv/*
