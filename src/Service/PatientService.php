@@ -24,7 +24,27 @@ class PatientService extends AbstractRestService {
         $this->uploadFileService = $uploadFileService;
     }
 
-    public function createPatient(bool $import, UploadedFile $file) {
+    /**
+     * @return array
+     */
+    public function findAll(): array {
+        return $this->repository->findAll();
+    }
+
+    public function findById(int $id)
+    {
+        return $this->repository->findBy(array(
+            'id' => $id
+        ));
+    }
+
+    /**
+     * @param bool $import
+     * @param UploadedFile $file
+     * 
+     * @return array
+     */
+    public function createPatient(bool $import, UploadedFile $file): array {
         try {
             $path = './uploads/csv';
             $fileName = $this->uploadFileService->upload($file, $path, ['csv']);
