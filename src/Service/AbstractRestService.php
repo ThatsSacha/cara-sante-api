@@ -41,7 +41,7 @@ abstract class AbstractRestService {
 
     public function create(array $data) {
         $row = $this->denormalizeData($data);
-        
+        //dd($this->emi->getRepository($this->className));
         $this->emi->persist($row);
         $this->emi->flush();
 

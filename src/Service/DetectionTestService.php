@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\DetectionTest;
 use App\Entity\Patient;
 use App\Entity\Users;
 use Exception;
@@ -56,7 +57,7 @@ class DetectionTestService extends AbstractRestService {
         $data['user'] = $user->getId();
         $data['testedAt'] = $patientObject['testedAt'];
 
-        dd($this->create($data));
+        $this->create($data);
     }
 
     /**

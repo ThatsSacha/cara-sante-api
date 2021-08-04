@@ -18,11 +18,6 @@ class DetectionTest
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Patient::class, inversedBy="detectionTests", cascade={"persist"})
-     */
-    private $patient;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $testedAt;
@@ -33,7 +28,7 @@ class DetectionTest
     private $isInvoiced = false;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="detectionTests")
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="detectionTests", cascade={"persist"})
      */
     private $user;
 
@@ -41,6 +36,12 @@ class DetectionTest
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $filledAt = false;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Patient::class, inversedBy="detectionTests", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $patient;
 
     public function jsonSerialize(): array {
         return array();

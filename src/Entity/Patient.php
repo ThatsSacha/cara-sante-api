@@ -65,7 +65,7 @@ class Patient
     private $nir;
 
     /**
-     * @ORM\OneToMany(targetEntity=DetectionTest::class, mappedBy="patient", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=DetectionTest::class, mappedBy="patient", orphanRemoval=true)
      */
     private $detectionTests;
 
