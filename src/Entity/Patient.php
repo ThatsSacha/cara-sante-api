@@ -65,21 +65,6 @@ class Patient
     private $nir;
 
     /**
-     * @ORM\Column(type="datetime")
-     */
-    private $testedAt;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isFilled = false;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isInvoiced = false;
-
-    /**
      * @ORM\OneToMany(targetEntity=DetectionTest::class, mappedBy="patient")
      */
     private $detectionTests;
@@ -101,9 +86,7 @@ class Patient
             'zip' => $this->getZip(),
             'city' => $this->getCity(),
             'nir' => $this->getNir(),
-            'testedAt' => $this->getTestedAt(),
-            'isFilled' => $this->getIsFilled(),
-            'isInvoiced' => $this->getIsInvoiced()
+            'tests' => $this->getDetectionTests() !== null ? null : $this->getDetectionTests()->jsonSerialize()
         );
     }
 
@@ -216,42 +199,6 @@ class Patient
     public function setNir(string $nir): self
     {
         $this->nir = $nir;
-
-        return $this;
-    }
-
-    public function getTestedAt(): ?\DateTimeInterface
-    {
-        return $this->testedAt;
-    }
-
-    public function setTestedAt(\DateTimeInterface $testedAt): self
-    {
-        $this->testedAt = $testedAt;
-
-        return $this;
-    }
-
-    public function getIsFilled(): ?bool
-    {
-        return $this->isFilled;
-    }
-
-    public function setIsFilled(bool $isFilled): self
-    {
-        $this->isFilled = $isFilled;
-
-        return $this;
-    }
-
-    public function getIsInvoiced(): ?bool
-    {
-        return $this->isInvoiced;
-    }
-
-    public function setIsInvoiced(bool $isInvoiced): self
-    {
-        $this->isInvoiced = $isInvoiced;
 
         return $this;
     }

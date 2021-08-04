@@ -43,6 +43,10 @@ class DetectionTest
      */
     private $filledAt;
 
+    public function jsonSerialize(): array {
+        return array();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
