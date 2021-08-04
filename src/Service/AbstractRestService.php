@@ -4,23 +4,27 @@ namespace App\Service;
 use Normalizer;
 use App\Entity\Users;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Normalizer\AssociationNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 abstract class AbstractRestService {
     private $repository;
     private $className;
-    private $denormalize;
+    private $denormalizer;
     private $emi;
 
     public function __construct(ServiceEntityRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer)
     {
         $this->repository = $repository;
         $this->className = $repository->getClassName();
-        $this->denormalize = $denormalizer;
+        $this->denormalizer = $denormalizer;
         $this->emi = $emi;
     }
 
@@ -41,7 +45,7 @@ abstract class AbstractRestService {
 
     public function create(array $data) {
         $row = $this->denormalizeData($data);
-        //dd($this->emi->getRepository($this->className));
+
         $this->emi->persist($row);
         $this->emi->flush();
 
@@ -49,6 +53,6 @@ abstract class AbstractRestService {
     }
 
     public function denormalizeData(array $data) {
-        return $this->denormalize->denormalize($data, $this->getClassName());
+        return $this->denormalizer->denormalize($data, $this->getClassName());
     }
 }

@@ -56,7 +56,7 @@ class DetectionTestService extends AbstractRestService {
         $data['patient'] = $createdPatient->getId();
         $data['user'] = $user->getId();
         $data['testedAt'] = $patientObject['testedAt'];
-
+        
         $this->create($data);
     }
 

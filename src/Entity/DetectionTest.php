@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\DetectionTestRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,17 +30,18 @@ class DetectionTest
 
     /**
      * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="detectionTests", cascade={"persist"})
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true, default=null)
      */
-    private $filledAt = false;
+    private $filledAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=Patient::class, inversedBy="detectionTests", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="patient_id", referencedColumnName="id", nullable=false)
      */
     private $patient;
 
@@ -64,12 +66,12 @@ class DetectionTest
         return $this;
     }
 
-    public function getTestedAt(): ?\DateTimeInterface
+    public function getTestedAt(): ?DateTime
     {
         return $this->testedAt;
     }
 
-    public function setTestedAt(\DateTimeInterface $testedAt): self
+    public function setTestedAt(DateTime $testedAt): self
     {
         $this->testedAt = $testedAt;
 
@@ -100,12 +102,12 @@ class DetectionTest
         return $this;
     }
 
-    public function getFilledAt(): ?\DateTimeInterface
+    public function getFilledAt(): ?DateTime
     {
         return $this->filledAt;
     }
 
-    public function setFilledAt(?\DateTimeInterface $filledAt): self
+    public function setFilledAt(?DateTime $filledAt): self
     {
         $this->filledAt = $filledAt;
 
