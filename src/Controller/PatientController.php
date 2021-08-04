@@ -36,7 +36,7 @@ class PatientController extends AbstractController
         $file = $request->files->get('file');
         // Import = true -> import data to db
         $import = strtolower($request->get('import')) === 'true' ? true : false;
-        $import = $this->service->createPatient($import, $file);
+        $import = $this->service->createPatient($import, $file, $this->getUser());
 
         return new JsonResponse($import, $import['status']);
     }

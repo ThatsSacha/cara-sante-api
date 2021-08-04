@@ -2,9 +2,14 @@
 
 namespace App\Service;
 
-use App\Entity\Patient;
-use App\Repository\PatientRepository;
 use Exception;
+use App\Entity\Patient;
+use App\Entity\Users;
+use App\Service\ParseCsvService;
+use App\Service\UploadFileService;
+use App\Service\AbstractRestService;
+use App\Repository\PatientRepository;
+use App\Service\DetectionTestService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -15,13 +20,15 @@ class PatientService extends AbstractRestService {
     private $repository;
     private $parseCsvService;
     private $uploadFileService;
+    private $detectionTestService;
 
-    public function __construct(PatientRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, ParseCsvService $parseCsvService, UploadFileService $uploadFileService) {
+    public function __construct(PatientRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, ParseCsvService $parseCsvService, UploadFileService $uploadFileService, DetectionTestService $detectionTestService) {
         parent::__construct($repository, $emi, $denormalizer);
 
         $this->repository = $repository;
         $this->parseCsvService = $parseCsvService;
         $this->uploadFileService = $uploadFileService;
+        $this->detectionTestService = $detectionTestService;
     }
 
     /**
@@ -46,18 +53,25 @@ class PatientService extends AbstractRestService {
     /**
      * @param bool $import
      * @param UploadedFile $file
+     * @param Users $user
      * 
      * @return array
      */
-    public function createPatient(bool $import, UploadedFile $file): array {
+    public function createPatient(bool $import, UploadedFile $file, Users $user): array {
         try {
             $path = './uploads/csv';
             $fileName = $this->uploadFileService->upload($file, $path, ['csv']);
             $patients = $this->parseCsvService->parseCsvToArray($fileName, $path)['lines'];
 
             if ($import) {
-                $foundPatients = $this->findAll();
+                $createdPatient = null;
+                $firstTimeCreate = false;
                 $existingPatients = [];
+                $foundPatients = $this->findAll();
+
+                if (count($foundPatients) === 0) {
+                    $firstTimeCreate = true;
+                }
 
                 foreach($foundPatients as $patient) {
                     $patientSerialized = $patient->jsonSerialize();
@@ -77,9 +91,15 @@ class PatientService extends AbstractRestService {
                         'nir' => $patient['patient_nir'],
                         'testedAt' => $patient['date_time']
                     ];
-                    
-                    if (!$this->isPatientTestExists($patientObject, $existingPatients)) {
-                        $this->create($patientObject);
+
+                    if ($firstTimeCreate || !$this->usersExists($patientObject, $existingPatients)) {
+                        $createdPatient = $this->create($patientObject);
+                    } else {
+                        $createdPatient = $existingPatients[$patientObject['mail']][0];
+                    }
+
+                    if (!$this->detectionTestExists($patientObject, $createdPatient)) {
+                        $this->detectionTestService->createDetectionTest($createdPatient, $patientObject, $user);
                     }
                 }
             } else {
@@ -103,23 +123,22 @@ class PatientService extends AbstractRestService {
      * 
      * @return bool
      */
-    public function isPatientTestExists(array $patient, array $existingPatients): bool {
+    public function usersExists(array $patient, array $existingPatients): bool {
         if (isset($existingPatients[$patient['mail']])) {
-            $existingTests = $existingPatients[$patient['mail']];
-        
-            if (count($existingTests) > 0) {
-                foreach($existingTests as $existingTest) {
-                    $existingTestDate = strtotime(date_format($existingTest->getTestedAt(), 'Y-m-d H:i:s'));
-                    $patientTestDate = strtotime(date_format(date_create($patient['testedAt']), 'Y-m-d H:i:s'));
-    
-                    if ($existingTestDate === $patientTestDate) {
-                        return true;
-                    }
-                }
-            }
+            return true;
         }
 
         return false;
+    }
+
+    /**
+     * @param array $patientObject
+     * @param Patient $patient
+     * 
+     * @return bool
+     */
+    public function detectionTestExists(array $patientObject, Patient $patient): bool {
+        return $this->detectionTestService->detectionTestExists($patientObject, $patient);
     }
 
     /**
