@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -50,6 +52,16 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity=DetectionTest::class, mappedBy="user")
+     */
+    private $detectionTests;
+
+    public function __construct()
+    {
+        $this->detectionTests = new ArrayCollection();
+    }
 
     public function jsonSerialize(): array {
         return array(
@@ -180,6 +192,36 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DetectionTest[]
+     */
+    public function getDetectionTests(): Collection
+    {
+        return $this->detectionTests;
+    }
+
+    public function addDetectionTest(DetectionTest $detectionTest): self
+    {
+        if (!$this->detectionTests->contains($detectionTest)) {
+            $this->detectionTests[] = $detectionTest;
+            $detectionTest->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDetectionTest(DetectionTest $detectionTest): self
+    {
+        if ($this->detectionTests->removeElement($detectionTest)) {
+            // set the owning side to null (unless already changed)
+            if ($detectionTest->getUser() === $this) {
+                $detectionTest->setUser(null);
+            }
+        }
 
         return $this;
     }
