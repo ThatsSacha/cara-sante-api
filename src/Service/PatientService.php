@@ -31,7 +31,12 @@ class PatientService extends AbstractRestService {
         return $this->repository->findAll();
     }
 
-    public function findById(int $id)
+    /**
+     * @param int $id
+     * 
+     * @return array
+     */
+    public function findById(int $id): array
     {
         return $this->repository->findBy(array(
             'id' => $id

@@ -53,4 +53,18 @@ class PatientController extends AbstractController
 
         return new JsonResponse($patientsSerialized, 200);
     }
+
+    #[Route('/{id}', name: 'patient_edit', methods: ['OPTIONS', 'PUT'])]
+    public function edit(int $id, Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $update = $this->service->updatePatient($id, $data);
+
+        dd($update);
+
+        return new JsonResponse($patientsSerialized, 200);
+    }
 }
