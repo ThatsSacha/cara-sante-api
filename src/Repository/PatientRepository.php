@@ -60,7 +60,7 @@ class PatientRepository extends ServiceEntityRepository
         return $d->fetchAll();
     }
 
-    public function create(Patient $patient) {
+    /*public function create(Patient $patient) {
         $db = $this->getEntityManager()->getConnection();
         $query = 'INSERT INTO patient (first_name, last_name, mail, phone, birth, street, zip, city, nir) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $d = $db->prepare($query);
@@ -75,5 +75,5 @@ class PatientRepository extends ServiceEntityRepository
             $patient->getCity(),
             $patient->getNir()
         ));
-    }
+    }*/
 }

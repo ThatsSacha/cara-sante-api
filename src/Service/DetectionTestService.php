@@ -53,13 +53,15 @@ class DetectionTestService extends AbstractRestService {
     }
 
     public function createDetectionTest(array $createdPatient, $existing) {
+        $data = [];
         foreach($existing as $el) {
-            $data['patient'] = $el->getId();
-            $data['testedAt'] = $createdPatient['testedAt'];
+            $data[]['patient'] = $el->getId();
+            $data[]['testedAt'] = $createdPatient['testedAt'];
             
-            $row = $this->denormalizeData($data);
-            $this->repository->create($row);
+            //$row = $this->denormalizeData($data);
+            
         }
+        $this->create($data);
     }
 
     /**

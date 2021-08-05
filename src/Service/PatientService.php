@@ -63,6 +63,26 @@ class PatientService extends AbstractRestService {
             $patients = $this->parseCsvService->parseCsvToArray($fileName, $path)['lines'];
 
             if ($import) {
+                // constuct patient array
+                // $this->createPatients($patientArray);
+                // $this->createDetectionTest();
+
+                /* createPatient(patientArray) {
+                    $patients = $findAll();
+
+                    if ($patients count > 0)
+                        $patientToAdd = $this->checkExistingPatient($atients, $patientArray);
+                
+                    $this->add($patientArray)
+                }*/
+            
+                /*
+                    checkExistingPatient($patients, $patientArray) {
+                        // mettre en key nir pour les 2 tableaux
+                    }
+                */
+
+
                 $createdPatient = null;
                 $firstTimeCreate = false;
                 $existingPatients = [];
@@ -74,7 +94,7 @@ class PatientService extends AbstractRestService {
                 }
 
                 foreach($patients as $i => $patient) {
-                    $existingPatients = $this->findExistingPatients();
+                    //$existingPatients = $this->findExistingPatients();
 
                     $patientObject[] = [
                         'firstName' => $patient['patient_first_name'],
@@ -89,23 +109,27 @@ class PatientService extends AbstractRestService {
                         'testedAt' => $patient['date_time']
                     ];
 
-                    if ($firstTimeCreate || !$this->usersExists($patientObject[$i], $existingPatients)) {
+                    //if ($firstTimeCreate || !$this->usersExists($patientObject[$i], $existingPatients)) {
                         //$patientObject[$i]['birth'] = date_create($patientObject[$i]['birth']);
                         //dd($patientObject[$i]);
                         unset($patientObject[$i]['testedAt']);
-                        $row = $this->denormalizeData($patientObject[$i]);
+                        //$row = $this->denormalizeData($patientObject[$i]);
                         //dd($row);
-                        $this->repository->create($row);
+                        
                         //$this->create($patientObject[$i]);
-                    }
+                    //}
                 }
-
+                $this->create($patientObject);
+               
                 $existingPatients = $this->findExistingPatients();
 
                 foreach($patientObject as $el) {
-                    if (!$this->detectionTestExists($el, $existingPatients)) {
+                    /*if (!$this->detectionTestExists($el, $existingPatients)) {
                         $this->detectionTestService->createDetectionTest($el, $existingPatients[$el['nir']]);
-                    }
+                    }*/
+                    dd($existingPatients, $el);
+                    $this->detectionTestService->createDetectionTest($el, $existingPatients[$el['nir']]);
+                    
                 }
                 
                 
@@ -126,8 +150,9 @@ class PatientService extends AbstractRestService {
 
     public function findExistingPatients() {
         $foundPatients = $this->findAll();
-        $foundPatients = $this->denormalizeData($foundPatients);
 
+        $b = $this->denormalizeData($foundPatients);
+        dd($foundPatients, $b);
         $existingPatients = [];
 
         foreach($foundPatients as $patient) {
