@@ -47,4 +47,24 @@ class DetectionTestRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findAll() {
+        $db = $this->getEntityManager()->getConnection();
+        $query = 'SELECT * FROM detection_test';
+        $d = $db->prepare($query);
+        $d->execute();
+
+        return $d->fetchAll();
+    }
+
+    public function create(DetectionTest $detectionTest) {
+        $db = $this->getEntityManager()->getConnection();
+        $query = 'INSERT INTO detection_test (patient_id, tested_at, is_invoiced) VALUES(?, ?, ?)';
+        $d = $db->prepare($query);
+        $d->executeQuery(array(
+            $detectionTest->getPatient()->getId(),
+            date_format($detectionTest->getTestedAt(), 'Y-m-d H:i'),
+            $detectionTest->getIsInvoiced()
+        ));
+    }
 }

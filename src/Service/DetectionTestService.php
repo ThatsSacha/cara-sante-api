@@ -52,26 +52,40 @@ class DetectionTestService extends AbstractRestService {
         ));
     }
 
-    public function createDetectionTest(Patient $createdPatient, array $patientObject, Users $user) {
-        $data['patient'] = $createdPatient->getId();
-        $data['user'] = $user->getId();
-        $data['testedAt'] = $patientObject['testedAt'];
-        
-        $this->create($data);
+    public function createDetectionTest(array $createdPatient, $existing) {
+        foreach($existing as $el) {
+            $data['patient'] = $el->getId();
+            $data['testedAt'] = $createdPatient['testedAt'];
+            
+            $row = $this->denormalizeData($data);
+            $this->repository->create($row);
+        }
     }
 
     /**
      * @param array $patientObject
-     * @param Patient $patient
+     * @param array $existingPatients
      * 
      * @return bool
      */
-    public function detectionTestExists(array $patientObject, Patient $patient): bool {
-        $id = $patient->getId();
-        $detectionTests = $this->findByPatientId($id);
-        
-        if (count($detectionTests) > 0) {
-
+    public function detectionTestExists(array $patientObject, array $existingPatients): bool {
+        //dd($patientObject, $existingPatients[$patientObject['mail']]);
+        //dd('here');
+        if (isset($existingPatients[$patientObject['nir']])) {
+            foreach($existingPatients[$patientObject['nir']] as $existingPatient) {
+                $patient = $existingPatient->jsonSerialize();
+    
+                if ($patient['detectionTest'] !== null) {
+                    foreach($patient['detectionTest'] as $detectionTest) {
+                        $patientObjectTestedAtDate = date_format(date_create($patientObject['testedAt']), 'Y-m-d H:i');
+                        $detectionTestTestedAtDate = date_format($detectionTest['testedAt'], 'Y-m-d H:i');
+            
+                        if ($patientObjectTestedAtDate === $detectionTestTestedAtDate) {
+                            return true;
+                        }
+                    }
+                }
+            }
         }
 
         return false;

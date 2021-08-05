@@ -86,7 +86,22 @@ class Patient
             'zip' => $this->getZip(),
             'city' => $this->getCity(),
             'nir' => $this->getNir(),
-            'tests' => $this->getDetectionTests() !== null ? null : $this->getDetectionTests()->jsonSerialize()
+            'detectionTest' => count($this->getDetectionTestsSerialized()) === 0 ? null : $this->getDetectionTestsSerialized()
+        );
+    }
+
+    public function jsonSerializeLight(): array {
+        return array(
+            'id' => $this->getId(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'mail' => $this->getMail(),
+            'phone' => $this->getPhone(),
+            'birth' => $this->getBirth(),
+            'street' => $this->getStreet(),
+            'zip' => $this->getZip(),
+            'city' => $this->getCity(),
+            'nir' => $this->getNir()
         );
     }
 
@@ -143,12 +158,12 @@ class Patient
         return $this;
     }
 
-    public function getBirth(): ?\DateTimeInterface
+    public function getBirth(): ?\DateTime
     {
         return $this->birth;
     }
 
-    public function setBirth(\DateTimeInterface $birth): self
+    public function setBirth(\DateTime $birth): self
     {
         $this->birth = $birth;
 
@@ -201,6 +216,20 @@ class Patient
         $this->nir = $nir;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDetectionTestsSerialized()
+    {
+        $tmp = [];
+
+        foreach($this->detectionTests as $detectionTest) {
+            $tmp[] = $detectionTest->jsonSerialize();
+        }
+
+        return $tmp;
     }
 
     /**

@@ -30,14 +30,14 @@ class DetectionTest
 
     /**
      * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="detectionTests", cascade={"persist"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
      */
-    private $user;
+    private $user = null;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true, default=null)
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $filledAt;
+    private $filledAt = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Patient::class, inversedBy="detectionTests", cascade={"persist"})
@@ -46,7 +46,14 @@ class DetectionTest
     private $patient;
 
     public function jsonSerialize(): array {
-        return array();
+        return array(
+            'id' => $this->getId(),
+            'patient' => $this->getPatient()->jsonSerializeLight(),
+            'testedAt' => $this->getTestedAt(),
+            'isInvoiced' => $this->getIsInvoiced(),
+            'filledAt' => $this->getFilledAt(),
+            'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight()
+        );
     }
 
     public function getId(): ?int

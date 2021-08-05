@@ -53,12 +53,11 @@ class PatientService extends AbstractRestService {
     /**
      * @param bool $import
      * @param UploadedFile $file
-     * @param Users $user
      * 
      * @return array
      */
-    public function createPatient(bool $import, UploadedFile $file, Users $user): array {
-        try {
+    public function createPatient(bool $import, UploadedFile $file): array {
+        //try {
             $path = './uploads/csv';
             $fileName = $this->uploadFileService->upload($file, $path, ['csv']);
             $patients = $this->parseCsvService->parseCsvToArray($fileName, $path)['lines'];
@@ -67,19 +66,17 @@ class PatientService extends AbstractRestService {
                 $createdPatient = null;
                 $firstTimeCreate = false;
                 $existingPatients = [];
-                $foundPatients = $this->findAll();
+                $foundPatients = $this->findExistingPatients();
+                $patientObject = [];
 
                 if (count($foundPatients) === 0) {
                     $firstTimeCreate = true;
                 }
 
-                foreach($foundPatients as $patient) {
-                    $patientSerialized = $patient->jsonSerialize();
-                    $existingPatients[$patientSerialized['mail']][] = $patient;
-                }
+                foreach($patients as $i => $patient) {
+                    $existingPatients = $this->findExistingPatients();
 
-                foreach($patients as $patient) {
-                    $patientObject = [
+                    $patientObject[] = [
                         'firstName' => $patient['patient_first_name'],
                         'lastName' => $patient['patient_usual_name'],
                         'mail' => $patient['patient_email'],
@@ -92,16 +89,26 @@ class PatientService extends AbstractRestService {
                         'testedAt' => $patient['date_time']
                     ];
 
-                    if ($firstTimeCreate || !$this->usersExists($patientObject, $existingPatients)) {
-                        $createdPatient = $this->create($patientObject);
-                    } else {
-                        $createdPatient = $existingPatients[$patientObject['mail']][0];
-                    }
-
-                    if (!$this->detectionTestExists($patientObject, $createdPatient)) {
-                        $this->detectionTestService->createDetectionTest($createdPatient, $patientObject, $user);
+                    if ($firstTimeCreate || !$this->usersExists($patientObject[$i], $existingPatients)) {
+                        //$patientObject[$i]['birth'] = date_create($patientObject[$i]['birth']);
+                        //dd($patientObject[$i]);
+                        unset($patientObject[$i]['testedAt']);
+                        $row = $this->denormalizeData($patientObject[$i]);
+                        //dd($row);
+                        $this->repository->create($row);
+                        //$this->create($patientObject[$i]);
                     }
                 }
+
+                $existingPatients = $this->findExistingPatients();
+
+                foreach($patientObject as $el) {
+                    if (!$this->detectionTestExists($el, $existingPatients)) {
+                        $this->detectionTestService->createDetectionTest($el, $existingPatients[$el['nir']]);
+                    }
+                }
+                
+                
             } else {
                 $this->parseCsvService->writeToResult($patients);
             }
@@ -109,12 +116,26 @@ class PatientService extends AbstractRestService {
             return array(
                 'status' => 201
             );
-        } catch (Exception $e) {
+        /*} catch (Exception $e) {
             return array(
                 'status' => 400,
                 'message' => $e->getMessage()
             );
+        }*/
+    }
+
+    public function findExistingPatients() {
+        $foundPatients = $this->findAll();
+        $foundPatients = $this->denormalizeData($foundPatients);
+
+        $existingPatients = [];
+
+        foreach($foundPatients as $patient) {
+            $patientSerialized = $patient->jsonSerialize();
+            $existingPatients[$patientSerialized['nir']][] = $patient;
         }
+
+        return $existingPatients;
     }
 
     /**
@@ -124,7 +145,7 @@ class PatientService extends AbstractRestService {
      * @return bool
      */
     public function usersExists(array $patient, array $existingPatients): bool {
-        if (isset($existingPatients[$patient['mail']])) {
+        if (isset($existingPatients[$patient['nir']])) {
             return true;
         }
 
@@ -137,8 +158,8 @@ class PatientService extends AbstractRestService {
      * 
      * @return bool
      */
-    public function detectionTestExists(array $patientObject, Patient $patient): bool {
-        return $this->detectionTestService->detectionTestExists($patientObject, $patient);
+    public function detectionTestExists(array $patientObject, array $existingPatients): bool {
+        return $this->detectionTestService->detectionTestExists($patientObject, $existingPatients);
     }
 
     /**

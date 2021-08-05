@@ -1,16 +1,7 @@
 <?php
 
 namespace App\Service;
-use Normalizer;
-use App\Entity\Users;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Normalizer\AssociationNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -19,6 +10,7 @@ abstract class AbstractRestService {
     private $className;
     private $denormalizer;
     private $emi;
+    private $serializer;
 
     public function __construct(ServiceEntityRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer)
     {
