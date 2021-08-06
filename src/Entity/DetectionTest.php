@@ -45,6 +45,11 @@ class DetectionTest
      */
     private $patient;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ref;
+
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
@@ -117,6 +122,18 @@ class DetectionTest
     public function setFilledAt(?DateTime $filledAt): self
     {
         $this->filledAt = $filledAt;
+
+        return $this;
+    }
+
+    public function getRef(): ?string
+    {
+        return $this->ref;
+    }
+
+    public function setRef(string $ref): self
+    {
+        $this->ref = $ref;
 
         return $this;
     }

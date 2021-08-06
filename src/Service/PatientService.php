@@ -57,35 +57,16 @@ class PatientService extends AbstractRestService {
      * @return array
      */
     public function createPatient(bool $import, UploadedFile $file): array {
-        //try {
+        try {
             $path = './uploads/csv';
             $fileName = $this->uploadFileService->upload($file, $path, ['csv']);
             $detectionTests = $this->parseCsvService->parseCsvToArray($fileName, $path)['lines'];
 
             if ($import) {
-                // constuct patient array with nir as key
-                // $this->createPatients($csvPatient);
-                // $this->createDetectionTest();
-
-                /* createPatient(csvPatient) {
-                    $patients = $findAll();
-                    // patients array -> nir as key
-
-                    if ($patients count > 0)
-                        $patientToAdd = $this->checkExistingPatient($patients, $csvPatient);
-                
-                    $this->add($csvPatient)
-                }*/
-            
-                /*
-                    checkExistingPatient($patients, $csvPatient) {
-                        if array_key_exists $patients nir dans $csvPatient
-                            return $csvPatient de $patients[nir]
-                        return false
-                    }
-                */
                 $csvDetectionTest = [];
                 $csvNir = [];
+                // Empty last time write in file do prevent double values
+                file_put_contents('./uploads/detection-test.log', '');
 
                 foreach($detectionTests as $i => $detectionTest) {
                     $firstName = $detectionTest['patient_first_name'];
@@ -93,11 +74,16 @@ class PatientService extends AbstractRestService {
                     $mail = $detectionTest['patient_email'];
                     $phone = $detectionTest['patient_phone'];
                     $birth = $detectionTest['patient_birthday'];
+                    $nir = $detectionTest['patient_nir'];
+                    $ref= $detectionTest[' ref'];
+                    $dateTime = $detectionTest['date_time'];
+                    $mainAddress = $detectionTest['patient_main_address_address'];
 
-                    if (!empty($detectionTest['patient_nir'])) {
-                        $csvDetectionTest[$detectionTest[' ref']] = [
-                            'nir' => $detectionTest['patient_nir'],
-                            'testedAt' => $detectionTest['date_time']
+                    if (!empty($nir)) {
+                        $csvDetectionTest[$ref] = [
+                            'ref' => $ref,
+                            'nir' => $nir,
+                            'testedAt' => $dateTime
                         ];
 
                         $csvNir[$detectionTest['patient_nir']] = [
@@ -106,19 +92,20 @@ class PatientService extends AbstractRestService {
                             'mail' => $mail,
                             'phone' => $phone,
                             'birth' => $birth,
-                            'street' => $detectionTest['patient_main_address_address'],
+                            'street' => $mainAddress,
                             'zip' => $detectionTest['patient_main_address_zip'],
                             'city' => $detectionTest['patient_main_address_city'],
-                            'nir' => $detectionTest['patient_nir'],
-                            'testedAt' => $detectionTest['date_time']
+                            'nir' => $nir,
+                            'testedAt' => $dateTime
                         ];
                     } else {
-                        // write to log
+                        $write = "\nNIR empty : $firstName $lastName - $phone - $mail";
+                        file_put_contents('./uploads/detection-test.log', $write, FILE_APPEND);
                     }
                 }
 
                 $createdPatients = $this->createPatients($csvNir);
-                $this->createDetectionTests($csvDetectionTest, $createdPatients[1]);
+                $this->detectionTestService->createDetectionTests($csvDetectionTest, $createdPatients[1]);
             } else {
                 $this->parseCsvService->writeToResult($detectionTests);
             }
@@ -126,12 +113,12 @@ class PatientService extends AbstractRestService {
             return array(
                 'status' => 201
             );
-        /*} catch (Exception $e) {
+        } catch (Exception $e) {
             return array(
                 'status' => 400,
                 'message' => $e->getMessage()
             );
-        }*/
+        }
     }
 
     public function getPatients() {
@@ -176,29 +163,6 @@ class PatientService extends AbstractRestService {
         }
 
         return $patientToAdd;
-    }
-    
-    /**
-     * @param array $csvDetectionTests
-     * @param array $createdPatients
-     */
-    public function createDetectionTests(array $csvDetectionTests, array $createdPatients) {
-        $detectionTests = $this->detectionTestService->findAll();
-        $detectionTestsInDb = [];
-
-        foreach($detectionTests as $detectionTest) {
-            $detectionTestsInDb[$detectionTest['nir']] = $detectionTest;
-        }
-        
-        /*if (count($detectionTests) > 0) {
-            $csvDetectionTests = $this->checkExistingPatient($detectionTestsInDb, $csvDetectionTests);
-        }*/
-
-        foreach($csvDetectionTests as $i => $csvDetectionTest) {
-            $csvDetectionTests[$i]['patient'] = (int) $createdPatients[$csvDetectionTest['nir']]['id'];
-        }
-
-        $this->detectionTestService->createDetectionTest($csvDetectionTests);
     }
 
     /**

@@ -2,9 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\DetectionTest;
-use App\Entity\Patient;
-use App\Entity\Users;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DetectionTestRepository;
@@ -52,46 +49,61 @@ class DetectionTestService extends AbstractRestService {
         ));
     }
 
-    public function createDetectionTest(array $csvDetectionTests) {
-        /*$data = [];
-        foreach($existing as $el) {
-            $data[]['patient'] = $el->getId();
-            $data[]['testedAt'] = $createdPatient['testedAt'];
-            
-            //$row = $this->denormalizeData($data);
-            
+    /**
+     * @return array
+     */
+    public function getDetectionTests(): array {
+        $detectionTests = $this->findAll();
+        $detectionTestsInDb = [];
+
+        foreach($detectionTests as $detectionTest) {
+            $detectionTestsInDb[$detectionTest['ref']] = $detectionTest;
         }
-        $this->create($data);*/
-        return $this->createFromArray($csvDetectionTests);
+
+        return array($detectionTests, $detectionTestsInDb);
+    }
+    
+    /**
+     * @param array $csvDetectionTests
+     * @param array $createdPatients
+     */
+    public function createDetectionTests(array $csvDetectionTests, array $createdPatients) {
+        $detectionTests = $this->getDetectionTests();
+        
+        if (count($detectionTests[0]) > 0) {
+            $csvDetectionTests = $this->checkExistingDetectionTest($detectionTests[1], $csvDetectionTests);
+        }
+
+        foreach($csvDetectionTests as $i => $csvDetectionTest) {
+            $csvDetectionTests[$i]['patient'] = (int) $createdPatients[$csvDetectionTest['nir']]['id'];
+        }
+
+        $this->createDetectionTest($csvDetectionTests);
     }
 
     /**
-     * @param array $patientObject
-     * @param array $existingPatients
+     * @param array $detectionTestsInDb
+     * @param array $csvDetectionTests
      * 
-     * @return bool
+     * @return array
      */
-    public function detectionTestExists(array $patientObject, array $existingPatients): bool {
-        //dd($patientObject, $existingPatients[$patientObject['mail']]);
-        //dd('here');
-        if (isset($existingPatients[$patientObject['nir']])) {
-            foreach($existingPatients[$patientObject['nir']] as $existingPatient) {
-                $patient = $existingPatient->jsonSerialize();
-    
-                if ($patient['detectionTest'] !== null) {
-                    foreach($patient['detectionTest'] as $detectionTest) {
-                        $patientObjectTestedAtDate = date_format(date_create($patientObject['testedAt']), 'Y-m-d H:i');
-                        $detectionTestTestedAtDate = date_format($detectionTest['testedAt'], 'Y-m-d H:i');
-            
-                        if ($patientObjectTestedAtDate === $detectionTestTestedAtDate) {
-                            return true;
-                        }
-                    }
-                }
+    public function checkExistingDetectionTest(array $detectionTestsInDb, array $csvDetectionTests): array {
+        $detectionTestsToAdd = [];
+        
+        foreach($csvDetectionTests as $nir => $csvDetectionTest) {
+            if (!array_key_exists($nir, $detectionTestsInDb)) {
+                $detectionTestsToAdd[$csvDetectionTest['ref']] = $csvDetectionTest;
             }
         }
 
-        return false;
+        return $detectionTestsToAdd;
+    }
+
+    /**
+     * @return array
+     */
+    public function createDetectionTest(array $csvDetectionTests): array {
+        return $this->createFromArray($csvDetectionTests);
     }
 
     /**
