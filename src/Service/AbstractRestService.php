@@ -36,16 +36,26 @@ abstract class AbstractRestService {
     }
 
     public function create(array $data) {
-        //dd($data);
-        foreach($data as $el) {
-            $row = $this->denormalizeData($el);
+        $row = $this->denormalizeData($data);
 
-            $this->emi->persist($row);
+        $this->emi->persist($row);
+        $this->emi->flush();
+
+        return $row;
+    }
+
+    public function createFromArray(array $data) {
+        $row = [];
+
+        foreach($data as $el) {
+            $tmpRow = $this->denormalizeData($el);
+            $this->emi->persist($tmpRow);
+
+            $row[] = $tmpRow;
         }
         
         $this->emi->flush();
-
-        //return $row;
+        return $row;
     }
 
     public function denormalizeData(array $data) {

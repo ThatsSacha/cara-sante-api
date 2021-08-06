@@ -63,76 +63,51 @@ class PatientService extends AbstractRestService {
             $patients = $this->parseCsvService->parseCsvToArray($fileName, $path)['lines'];
 
             if ($import) {
-                // constuct patient array
-                // $this->createPatients($patientArray);
+                // constuct patient array with nir as key
+                // $this->createPatients($csvPatient);
                 // $this->createDetectionTest();
 
-                /* createPatient(patientArray) {
+                /* createPatient(csvPatient) {
                     $patients = $findAll();
+                    // patients array -> nir as key
 
                     if ($patients count > 0)
-                        $patientToAdd = $this->checkExistingPatient($atients, $patientArray);
+                        $patientToAdd = $this->checkExistingPatient($patients, $csvPatient);
                 
-                    $this->add($patientArray)
+                    $this->add($csvPatient)
                 }*/
             
                 /*
-                    checkExistingPatient($patients, $patientArray) {
-                        // mettre en key nir pour les 2 tableaux
+                    checkExistingPatient($patients, $csvPatient) {
+                        if array_key_exists $patients nir dans $csvPatient
+                            return $csvPatient de $patients[nir]
+                        return false
                     }
                 */
-
-
-                $createdPatient = null;
-                $firstTimeCreate = false;
-                $existingPatients = [];
-                $foundPatients = $this->findExistingPatients();
-                $patientObject = [];
-
-                if (count($foundPatients) === 0) {
-                    $firstTimeCreate = true;
-                }
+                $csvPatients = [];
 
                 foreach($patients as $i => $patient) {
-                    //$existingPatients = $this->findExistingPatients();
+                    $nir = $patient['patient_nir'];
 
-                    $patientObject[] = [
-                        'firstName' => $patient['patient_first_name'],
-                        'lastName' => $patient['patient_usual_name'],
-                        'mail' => $patient['patient_email'],
-                        'phone' => $patient['patient_phone'],
-                        'birth' => $patient['patient_birthday'],
-                        'street' => $patient['patient_main_address_address'],
-                        'zip' => $patient['patient_main_address_zip'],
-                        'city' => $patient['patient_main_address_city'],
-                        'nir' => $patient['patient_nir'],
-                        'testedAt' => $patient['date_time']
-                    ];
-
-                    //if ($firstTimeCreate || !$this->usersExists($patientObject[$i], $existingPatients)) {
-                        //$patientObject[$i]['birth'] = date_create($patientObject[$i]['birth']);
-                        //dd($patientObject[$i]);
-                        unset($patientObject[$i]['testedAt']);
-                        //$row = $this->denormalizeData($patientObject[$i]);
-                        //dd($row);
-                        
-                        //$this->create($patientObject[$i]);
-                    //}
+                    if (!empty($nir)) {
+                        $csvPatients[$nir] = [
+                            'firstName' => $patient['patient_first_name'],
+                            'lastName' => $patient['patient_usual_name'],
+                            'mail' => $patient['patient_email'],
+                            'phone' => $patient['patient_phone'],
+                            'birth' => $patient['patient_birthday'],
+                            'street' => $patient['patient_main_address_address'],
+                            'zip' => $patient['patient_main_address_zip'],
+                            'city' => $patient['patient_main_address_city'],
+                            'nir' => $nir,
+                            'testedAt' => $patient['date_time']
+                        ];
+                    } else {
+                        // write to log file patient with empty nir and dont add to $csvPatient
+                    }
                 }
-                $this->create($patientObject);
-               
-                $existingPatients = $this->findExistingPatients();
 
-                foreach($patientObject as $el) {
-                    /*if (!$this->detectionTestExists($el, $existingPatients)) {
-                        $this->detectionTestService->createDetectionTest($el, $existingPatients[$el['nir']]);
-                    }*/
-                    dd($existingPatients, $el);
-                    $this->detectionTestService->createDetectionTest($el, $existingPatients[$el['nir']]);
-                    
-                }
-                
-                
+                $this->createPatients($csvPatients);
             } else {
                 $this->parseCsvService->writeToResult($patients);
             }
@@ -148,43 +123,34 @@ class PatientService extends AbstractRestService {
         }*/
     }
 
-    public function findExistingPatients() {
-        $foundPatients = $this->findAll();
+    /**
+     * @param array $csvPatients
+     */
+    public function createPatients(array $csvPatients) {
+        $patients = $this->findAll();
+        $patientsInDb = [];
 
-        $b = $this->denormalizeData($foundPatients);
-        dd($foundPatients, $b);
-        $existingPatients = [];
-
-        foreach($foundPatients as $patient) {
-            $patientSerialized = $patient->jsonSerialize();
-            $existingPatients[$patientSerialized['nir']][] = $patient;
+        foreach($patients as $patient) {
+            $patientsInDb[$patient['nir']] = $patient;
+        }
+        
+        if (count($patientsInDb) > 0) {
+            $csvPatients = $this->checkExistingPatient($patientsInDb, $csvPatients);
         }
 
-        return $existingPatients;
+        $this->createFromArray($csvPatients);
     }
 
-    /**
-     * @param array $patient
-     * @param array $existingPatients
-     * 
-     * @return bool
-     */
-    public function usersExists(array $patient, array $existingPatients): bool {
-        if (isset($existingPatients[$patient['nir']])) {
-            return true;
+    public function checkExistingPatient(array $patientsInDb, array $csvPatients) {
+        $patientToAdd = [];
+        
+        foreach($csvPatients as $nir => $csvPatient) {
+            if (!array_key_exists($nir, $patientsInDb)) {
+                $patientToAdd[$csvPatient['nir']] = $csvPatient;
+            }
         }
 
-        return false;
-    }
-
-    /**
-     * @param array $patientObject
-     * @param Patient $patient
-     * 
-     * @return bool
-     */
-    public function detectionTestExists(array $patientObject, array $existingPatients): bool {
-        return $this->detectionTestService->detectionTestExists($patientObject, $existingPatients);
+        return $patientToAdd;
     }
 
     /**
