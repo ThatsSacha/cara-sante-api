@@ -46,9 +46,9 @@ abstract class AbstractRestService {
 
     public function createFromArray(array $data) {
         $row = [];
-
         foreach($data as $el) {
             $tmpRow = $this->denormalizeData($el);
+            
             $this->emi->persist($tmpRow);
 
             $row[] = $tmpRow;

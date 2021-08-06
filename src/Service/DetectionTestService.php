@@ -52,8 +52,8 @@ class DetectionTestService extends AbstractRestService {
         ));
     }
 
-    public function createDetectionTest(array $createdPatient, $existing) {
-        $data = [];
+    public function createDetectionTest(array $csvDetectionTests) {
+        /*$data = [];
         foreach($existing as $el) {
             $data[]['patient'] = $el->getId();
             $data[]['testedAt'] = $createdPatient['testedAt'];
@@ -61,7 +61,8 @@ class DetectionTestService extends AbstractRestService {
             //$row = $this->denormalizeData($data);
             
         }
-        $this->create($data);
+        $this->create($data);*/
+        return $this->createFromArray($csvDetectionTests);
     }
 
     /**
