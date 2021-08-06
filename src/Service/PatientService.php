@@ -3,8 +3,6 @@
 namespace App\Service;
 
 use Exception;
-use App\Entity\Patient;
-use App\Entity\Users;
 use App\Service\ParseCsvService;
 use App\Service\UploadFileService;
 use App\Service\AbstractRestService;

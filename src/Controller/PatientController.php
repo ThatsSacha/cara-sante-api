@@ -18,17 +18,12 @@ class PatientController extends AbstractController
         $this->service = $service;
     }
 
-    #[Route('/', name: 'patient_index', methods: ['OPTIONS', 'GET'])]
+    #[Route('', name: 'patient_index', methods: ['OPTIONS', 'GET'])]
     public function index(): JsonResponse
     {
         $patients = $this->service->findAll();
-        $patientsSerialized = [];
 
-        foreach ($patients as $patient) {
-            $patientsSerialized[] = $patient->jsonSerialize();
-        }
-
-        return new JsonResponse($patientsSerialized, 200);
+        return new JsonResponse($patients, 200);
     }
 
     #[Route('/import', name: 'patient_new_import', methods: ['OPTIONS', 'POST'])]

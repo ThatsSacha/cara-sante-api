@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-#[Route('/api/users')]
+#[Route('/api/user')]
 class UsersController extends AbstractController
 {
     private $usersService;
