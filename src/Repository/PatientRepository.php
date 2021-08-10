@@ -60,6 +60,15 @@ class PatientRepository extends ServiceEntityRepository
         return $d->fetchAll();
     }
 
+    public function findToTake() {
+        $db = $this->getEntityManager()->getConnection();
+        $query = 'SELECT *, patient.id AS patient_patient_id FROM patient LEFT JOIN detection_test ON patient.id = detection_test.patient_id WHERE detection_test.is_invoiced = false LIMIT 20';
+        $d = $db->prepare($query);
+        $d->executeQuery();
+
+        return $d->fetchAll();
+    }
+
     /*public function create(Patient $patient) {
         $db = $this->getEntityManager()->getConnection();
         $query = 'INSERT INTO patient (first_name, last_name, mail, phone, birth, street, zip, city, nir) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';

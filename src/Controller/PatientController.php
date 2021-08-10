@@ -26,6 +26,22 @@ class PatientController extends AbstractController
         return new JsonResponse($patients, 200);
     }
 
+    #[Route('/to-take', name: 'patient_index', methods: ['OPTIONS', 'GET'])]
+    public function toTake(): JsonResponse
+    {
+        $patients = $this->service->findToTake();
+        $patientsSerialized = [];
+
+        if (count($patients) > 0) {
+            foreach($patients as $patient) {
+                //dd($this->serialize($patient));
+                $patientsSerialized[] = $patient->jsonSerialize();
+            }
+        }
+
+        return new JsonResponse($patientsSerialized, 200);
+    }
+
     #[Route('/import', name: 'patient_new_import', methods: ['OPTIONS', 'POST'])]
     public function import(Request $request): JsonResponse {
         $file = $request->files->get('file');

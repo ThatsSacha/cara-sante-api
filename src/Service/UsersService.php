@@ -6,6 +6,7 @@ use Exception;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -15,8 +16,8 @@ class UsersService extends AbstractRestService {
     private $passwordHasher;
     private $repository;
 
-    public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher) {
-        parent::__construct($repository, $emi, $denormalizer);
+    public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher, NormalizerInterface $normalizer) {
+        parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->passwordHasher = $passwordHasher;
         $this->repository = $repository;

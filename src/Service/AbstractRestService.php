@@ -4,6 +4,7 @@ namespace App\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 abstract class AbstractRestService {
     private $repository;
@@ -11,13 +12,15 @@ abstract class AbstractRestService {
     private $denormalizer;
     private $emi;
     private $serializer;
+    private $normalizer;
 
-    public function __construct(ServiceEntityRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer)
+    public function __construct(ServiceEntityRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, NormalizerInterface $normalizer)
     {
         $this->repository = $repository;
         $this->className = $repository->getClassName();
         $this->denormalizer = $denormalizer;
         $this->emi = $emi;
+        $this->normalizer = $normalizer;
     }
 
     /**

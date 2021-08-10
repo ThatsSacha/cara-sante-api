@@ -5,6 +5,7 @@ namespace App\Service;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DetectionTestRepository;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 date_default_timezone_set('Europe/Paris');
@@ -12,8 +13,8 @@ date_default_timezone_set('Europe/Paris');
 class DetectionTestService extends AbstractRestService {
     private $repository;
 
-    public function __construct(DetectionTestRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer) {
-        parent::__construct($repository, $emi, $denormalizer);
+    public function __construct(DetectionTestRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, NormalizerInterface $normalizer) {
+        parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->repository = $repository;
     }

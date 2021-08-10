@@ -11,6 +11,7 @@ use App\Service\DetectionTestService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 date_default_timezone_set('Europe/Paris');
 
@@ -20,8 +21,8 @@ class PatientService extends AbstractRestService {
     private $uploadFileService;
     private $detectionTestService;
 
-    public function __construct(PatientRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, ParseCsvService $parseCsvService, UploadFileService $uploadFileService, DetectionTestService $detectionTestService) {
-        parent::__construct($repository, $emi, $denormalizer);
+    public function __construct(PatientRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, ParseCsvService $parseCsvService, UploadFileService $uploadFileService, DetectionTestService $detectionTestService, NormalizerInterface $normalizer) {
+        parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->repository = $repository;
         $this->parseCsvService = $parseCsvService;
@@ -34,6 +35,15 @@ class PatientService extends AbstractRestService {
      */
     public function findAll(): array {
         return $this->repository->findAll();
+    }
+
+    /**
+     * @return array
+     */
+    public function findToTake(): array {
+        $test = $this->repository->findToTake();
+        $test[1]['id'] = (int) $test[1]['patient_patient_id'];
+        dd($this->denormalizeData($test[1]));
     }
 
     /**
