@@ -56,7 +56,7 @@ class DetectionTest
             'id' => $this->getId(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'testedAt' => $this->getTestedAt(),
-            'fenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'd/m/Y H:i:s'))),
+            'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'd/m/Y H:i:s'))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
