@@ -48,12 +48,12 @@ class PatientController extends AbstractController
     public function show(int $id): JsonResponse
     {
         $patients = $this->service->findById($id);
-        $patientsSerialized = [];
+        $patient = [];
 
-        foreach ($patients as $patient) {
-            $patientsSerialized[] = $patient->jsonSerialize();
+        if (count($patients) > 0) {
+            $patient = $patients[0]->jsonSerialize();
         }
 
-        return new JsonResponse($patientsSerialized, 200);
+        return new JsonResponse($patient, 200);
     }
 }
