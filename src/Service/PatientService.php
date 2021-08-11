@@ -41,9 +41,17 @@ class PatientService extends AbstractRestService {
      * @return array
      */
     public function findToTake(): array {
-        $test = $this->repository->findToTake();
-        $test[1]['id'] = (int) $test[1]['patient_patient_id'];
-        dd($this->denormalizeData($test[1]));
+        $patients = $this->repository->findToTake();
+        $patientsSerialized = [];
+
+        foreach($patients as $i => $patient) {
+            $id = $patient['id'];
+            $patientDenormalized = $this->denormalizeData($patient);
+            $patientsSerialized[] = $patientDenormalized->jsonSerialize();
+            $patientsSerialized[$i]['id'] = $id;
+        }
+        
+        return $patientsSerialized;
     }
 
     /**

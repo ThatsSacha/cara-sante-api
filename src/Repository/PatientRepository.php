@@ -66,7 +66,12 @@ class PatientRepository extends ServiceEntityRepository
         $d = $db->prepare($query);
         $d->executeQuery();
 
-        return $d->fetchAll();
+        $requestMaped = array_map(function($el) {
+            $el['id'] = (int) $el['patient_patient_id'];
+            return $el;
+        }, $d->fetchAll());
+
+        return $requestMaped;
     }
 
     /*public function create(Patient $patient) {

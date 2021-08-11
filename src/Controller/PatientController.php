@@ -30,16 +30,8 @@ class PatientController extends AbstractController
     public function toTake(): JsonResponse
     {
         $patients = $this->service->findToTake();
-        $patientsSerialized = [];
 
-        if (count($patients) > 0) {
-            foreach($patients as $patient) {
-                //dd($this->serialize($patient));
-                $patientsSerialized[] = $patient->jsonSerialize();
-            }
-        }
-
-        return new JsonResponse($patientsSerialized, 200);
+        return new JsonResponse($patients, 200);
     }
 
     #[Route('/import', name: 'patient_new_import', methods: ['OPTIONS', 'POST'])]
