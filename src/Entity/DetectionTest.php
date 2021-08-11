@@ -57,6 +57,7 @@ class DetectionTest
             'testedAt' => $this->getTestedAt(),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
+            'patient' => $this->getPatient()->jsonSerializeLight(),
             'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight()
         );
     }

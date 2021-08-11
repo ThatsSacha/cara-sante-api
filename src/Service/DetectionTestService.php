@@ -118,4 +118,20 @@ class DetectionTestService extends AbstractRestService {
             throw new Exception($error);
         }
     }
+
+    /**
+     * @return array
+     */
+    public function findToTake(): array {
+        $detectionTests = $this->repository->findBy(array(
+            'isInvoiced' => false
+        ), null, 20);
+        $detectionTestsSerialized = [];
+
+        foreach($detectionTests as $detectionTest) {
+            $detectionTestsSerialized[] = $detectionTest->jsonSerialize();
+        }
+
+        return $detectionTestsSerialized;
+    }
 }
