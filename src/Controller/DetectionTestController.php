@@ -5,19 +5,41 @@ namespace App\Controller;
 use App\Entity\DetectionTest;
 use App\Form\DetectionTestType;
 use App\Repository\DetectionTestRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\DetectionTestService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api/detection-test')]
 class DetectionTestController extends AbstractController
 {
-    #[Route('/', name: 'detection_test_index', methods: ['GET'])]
-    public function index(DetectionTestRepository $detectionTestRepository): Response
+    private $service;
+    
+    public function __construct(DetectionTestService $service)
     {
-        return $this->render('detection_test/index.html.twig', [
-            'detection_tests' => $detectionTestRepository->findAll(),
-        ]);
+        $this->service = $service;
+    }
+
+    #[Route('', name: 'detection_test_index', methods: ['OPTIONS', 'GET'])]
+    public function index(): JsonResponse
+    {
+        $detectionTests = $this->service->findAll();
+
+        return new JsonResponse($detectionTests, 200);
+    }
+
+    #[Route('/{id}', name: 'deetction_test_show', methods: ['OPTIONS', 'GET'])]
+    public function show(int $id): JsonResponse
+    {
+        $detectionTests = $this->service->findById($id);
+        $detectionTest = [];
+
+        if (count($detectionTests) > 0) {
+            $detectionTest = $detectionTests[0]->jsonSerialize();
+        }
+
+        return new JsonResponse($detectionTest, 200);
     }
 }

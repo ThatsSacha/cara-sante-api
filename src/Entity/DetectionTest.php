@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\DetectionTestRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+setlocale(LC_TIME, 'fr_FR');
 
 /**
  * @ORM\Entity(repositoryClass=DetectionTestRepository::class)
@@ -55,6 +56,7 @@ class DetectionTest
             'id' => $this->getId(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'testedAt' => $this->getTestedAt(),
+            'fenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'd/m/Y H:i:s'))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
