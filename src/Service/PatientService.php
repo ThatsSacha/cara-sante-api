@@ -49,6 +49,7 @@ class PatientService extends AbstractRestService {
             $patientDenormalized = $this->denormalizeData($patient);
             $patientsSerialized[] = $patientDenormalized->jsonSerialize();
             $patientsSerialized[$i]['id'] = $id;
+            $patientsSerialized[$i]['birth'] = date_format(date_create($patient['birth']), 'd/m/Y');
         }
         
         return $patientsSerialized;
