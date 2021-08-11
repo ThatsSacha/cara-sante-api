@@ -81,7 +81,7 @@ class Patient
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
             'phone' => $this->getPhone(),
-            'birth' => $this->getBirth(),
+            'birth' => date_format($this->getBirth(), 'd/m/Y'),
             'street' => $this->getStreet(),
             'zip' => $this->getZip(),
             'city' => $this->getCity(),
