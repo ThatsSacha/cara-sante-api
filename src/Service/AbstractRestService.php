@@ -2,9 +2,10 @@
 
 namespace App\Service;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 abstract class AbstractRestService {
     private $repository;
@@ -61,7 +62,11 @@ abstract class AbstractRestService {
         return $row;
     }
 
-    public function denormalizeData(array $data) {
+    public function denormalizeData(array $data, $row = null) {
         return $this->denormalizer->denormalize($data, $this->getClassName());
+    }
+
+    public function getById(int $id) {
+        return $this->repository->findOneBy(array('id' => $id));
     }
 }

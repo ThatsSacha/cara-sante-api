@@ -6,6 +6,7 @@ use Exception;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\AST\Functions\ConcatFunction;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -15,12 +16,14 @@ date_default_timezone_set('Europe/Paris');
 class UsersService extends AbstractRestService {
     private $passwordHasher;
     private $repository;
+    private $emi;
 
     public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher, NormalizerInterface $normalizer) {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->passwordHasher = $passwordHasher;
         $this->repository = $repository;
+        $this->emi = $emi;
     }
 
     /**
@@ -88,6 +91,37 @@ class UsersService extends AbstractRestService {
         }
 
         return count($error) > 0 ? $this->throwError($error) : [];
+    }
+
+    /**
+     * @param string $mail
+     * 
+     * @return Users
+     */
+    public function getUserByMail(string $mail): Users {
+        return $this->repository->findOneBy(array('email' => $mail));
+    }
+
+    public function updateMe(array $data, Users $user) {
+        $me = $this->getUserByMail($user->getEmail());
+        
+        if (isset($data['firstName'])) {
+            $me->setFirstName($data['firstName']);
+        }
+        if (isset($data['lastName'])) {
+            $me->setLastName($data['lastName']);
+        }
+        if (isset($data['mail'])) {
+            $this->verifyMailFormat($data['mail']);
+            $this->verifyUniqueMail($data['mail']);
+            $me->setEmail($data['mail']);
+        }
+        if (isset($data['phone'])) {
+            $me->setPhone($data['phone']);
+        }
+
+        $this->emi->persist($me);
+        $this->emi->flush();
     }
 
     /**

@@ -39,4 +39,24 @@ class UsersController extends AbstractController
 
         return new JsonResponse($create, $status);
     }
+
+    #[Route('/me', name: 'users_me', methods: ['OPTIONS', 'GET'])]
+    public function me(): JsonResponse
+    {
+        $me = $this->getUser()->jsonSerialize();
+
+        return new JsonResponse($me, 200);
+    }
+
+    #[Route('/me', name: 'users_me_update', methods: ['OPTIONS', 'PUT'])]
+    public function meUpdate(Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $me = $this->usersService->updateMe($data, $this->getUser());
+
+        return new JsonResponse($this->getUser()->jsonSerialize(), 200);
+    }
 }

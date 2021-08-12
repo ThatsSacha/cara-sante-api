@@ -58,6 +58,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $detectionTests;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $phone;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
@@ -66,8 +71,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
             'mail' => $this->getEmail(),
-            'roles' => $this->getRoles()
+            'phone' => $this->getPhone(),
+            'roles' => $this->getRoles(),
+            'createdAt' => date_format($this->getCreatedAt(), 'd/m/Y H:s')
         );
     }
 
@@ -232,6 +241,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
                 $detectionTest->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

@@ -30,7 +30,7 @@ class DetectionTestController extends AbstractController
         return new JsonResponse($detectionTests, 200);
     }
 
-    #[Route('/{id}', name: 'deetction_test_show', methods: ['OPTIONS', 'GET'])]
+    #[Route('/{id}', name: 'detection_test_show', methods: ['OPTIONS', 'GET'])]
     public function show(int $id): JsonResponse
     {
         $detectionTests = $this->service->findById($id);
@@ -41,5 +41,17 @@ class DetectionTestController extends AbstractController
         }
 
         return new JsonResponse($detectionTest, 200);
+    }
+
+    #[Route('/{id}', name: 'detection_test_update', methods: ['OPTIONS', 'PUT'])]
+    public function update(int $id, Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $detectionTests = $this->service->updateDetectionTest($id, $data, $this->getUser());
+
+        return new JsonResponse($detectionTests, 200);
     }
 }

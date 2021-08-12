@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Users;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DetectionTestRepository;
@@ -12,11 +13,13 @@ date_default_timezone_set('Europe/Paris');
 
 class DetectionTestService extends AbstractRestService {
     private $repository;
+    private $emi;
 
     public function __construct(DetectionTestRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, NormalizerInterface $normalizer) {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->repository = $repository;
+        $this->emi = $emi;
     }
 
     /**
@@ -133,5 +136,27 @@ class DetectionTestService extends AbstractRestService {
         }
 
         return $detectionTestsSerialized;
+    }
+
+    /**
+     * @param int $id
+     * @param array $data
+     * @param Users $user
+     */
+    public function updateDetectionTest(int $id, array $data, Users $user) {
+        $data['isInvoiced'] = true;
+
+        if (!isset($data['filledAt']) || empty($data['filledAt'])) {
+            $data['filledAt'] = date_format(date_create(), 'd/m/Y');
+        }
+
+        $data['user'] = $user->getId();
+
+        $detectionTest = $this->getById($id);
+        $detectionTest->setInvoiced($data['isInvoiced']);
+        $detectionTest->setFilledAt($data['filledAt']);
+        $detectionTest->setUser($data['user']);
+        $this->emi->persist($detectionTest);
+        dd($detectionTest);
     }
 }
