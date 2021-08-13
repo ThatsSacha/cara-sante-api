@@ -147,16 +147,31 @@ class DetectionTestService extends AbstractRestService {
         $data['isInvoiced'] = true;
 
         if (!isset($data['filledAt']) || empty($data['filledAt'])) {
-            $data['filledAt'] = date_format(date_create(), 'd/m/Y');
+            $data['filledAt'] = date_create();
+        } else {
+            $data['filledAt'] = date_create($data['filledAt']);
         }
 
         $data['user'] = $user->getId();
 
         $detectionTest = $this->getById($id);
-        $detectionTest->setInvoiced($data['isInvoiced']);
-        $detectionTest->setFilledAt($data['filledAt']);
-        $detectionTest->setUser($data['user']);
-        $this->emi->persist($detectionTest);
-        dd($detectionTest);
+
+        if (!$detectionTest->getIsInvoiced()) {
+            $detectionTest->setIsInvoiced($data['isInvoiced']);
+            $detectionTest->setFilledAt($data['filledAt']);
+            $detectionTest->setUser($user);
+            $this->emi->persist($detectionTest);
+            $this->emi->flush();
+
+            return array(
+                'status' => 200,
+                $detectionTest->jsonSerialize()
+            );
+        }
+
+        return array(
+            'status' => 400,
+            'message' => 'Ce test a déjà été saisit'
+        );
     }
 }

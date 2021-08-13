@@ -105,18 +105,18 @@ class UsersService extends AbstractRestService {
     public function updateMe(array $data, Users $user) {
         $me = $this->getUserByMail($user->getEmail());
         
-        if (isset($data['firstName'])) {
+        if (isset($data['firstName']) && !empty($data['firstName'])) {
             $me->setFirstName($data['firstName']);
         }
-        if (isset($data['lastName'])) {
+        if (isset($data['lastName']) && !empty($data['lastName'])) {
             $me->setLastName($data['lastName']);
         }
-        if (isset($data['mail'])) {
+        if (isset($data['mail']) && !empty($data['mail'])) {
             $this->verifyMailFormat($data['mail']);
             $this->verifyUniqueMail($data['mail']);
             $me->setEmail($data['mail']);
         }
-        if (isset($data['phone'])) {
+        if (isset($data['phone']) && !empty($data['phone'])) {
             $me->setPhone($data['phone']);
         }
 

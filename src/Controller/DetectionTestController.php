@@ -52,6 +52,6 @@ class DetectionTestController extends AbstractController
 
         $detectionTests = $this->service->updateDetectionTest($id, $data, $this->getUser());
 
-        return new JsonResponse($detectionTests, 200);
+        return new JsonResponse($detectionTests, $detectionTests['status']);
     }
 }
