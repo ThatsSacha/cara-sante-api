@@ -59,7 +59,7 @@ class DetectionTest
             'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s'))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
-            'filledAtFrench' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))),
+            'filledAtFrench' => $this->getFilledAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))) : null,
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight()
         );
