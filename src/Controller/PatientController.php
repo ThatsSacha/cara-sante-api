@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\DetectionTestService;
 use App\Service\PatientService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,10 +13,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PatientController extends AbstractController
 {
     private $service;
+    private DetectionTestService $detectionTestService;
     
-    public function __construct(PatientService $service)
+    public function __construct(PatientService $service, DetectionTestService $detectionTestService)
     {
         $this->service = $service;
+        $this->detectionTestService = $detectionTestService;
     }
 
     #[Route('', name: 'patient_index', methods: ['OPTIONS', 'GET'])]
@@ -30,6 +33,14 @@ class PatientController extends AbstractController
     public function toTake(): JsonResponse
     {
         $patients = $this->service->findToTake();
+
+        return new JsonResponse($patients, 200);
+    }
+
+    #[Route('/taken', name: 'patient_taken', methods: ['OPTIONS', 'GET'])]
+    public function taken(): JsonResponse
+    {
+        $patients = $this->detectionTestService->findTaken($this->getUser());
 
         return new JsonResponse($patients, 200);
     }

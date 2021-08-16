@@ -174,4 +174,25 @@ class DetectionTestService extends AbstractRestService {
             'message' => 'Ce test a déjà été saisit'
         );
     }
+
+    /**
+     * @param Users $user
+     * 
+     * @return array
+     */
+    public function findTaken(Users $user): array {
+        $detectionTests = $this->repository->findBy(array(
+            'isInvoiced' => true,
+            'user' => $user->getId()
+        ), array(
+            'filledAt' => 'DESC'
+        ));
+        $detectionTestsSerialized = [];
+
+        foreach($detectionTests as $detectionTest) {
+            $detectionTestsSerialized[] = $detectionTest->jsonSerialize();
+        }
+
+        return $detectionTestsSerialized;
+    }
 }

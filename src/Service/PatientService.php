@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Users;
 use Exception;
 use App\Service\ParseCsvService;
 use App\Service\UploadFileService;
