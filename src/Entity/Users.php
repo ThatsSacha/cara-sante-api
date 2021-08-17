@@ -76,7 +76,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'mail' => $this->getEmail(),
             'phone' => $this->getPhone(),
             'roles' => $this->getRoles(),
-            'createdAt' => date_format($this->getCreatedAt(), 'd/m/Y H:s')
+            'createdAt' => date_format($this->getCreatedAt(), 'd/m/Y H:s'),
+            'createdAtFrench' => $this->getCreatedAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getCreatedAt(), 'Y-m-d H:i:s'))) : null
         );
     }
 
