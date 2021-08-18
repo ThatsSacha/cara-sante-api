@@ -77,7 +77,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'phone' => $this->getPhone(),
             'roles' => $this->getRoles(),
             'createdAt' => date_format($this->getCreatedAt(), 'd/m/Y H:s'),
-            'createdAtFrench' => $this->getCreatedAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getCreatedAt(), 'Y-m-d H:i:s'))) : null
+            'createdAtFrench' => $this->getCreatedAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getCreatedAt(), 'Y-m-d H:i:s'))) : null,
+            'detectionTests' => $this->getDetectionTestsSerialized()
         );
     }
 
@@ -222,6 +223,17 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function getDetectionTests(): Collection
     {
         return $this->detectionTests;
+    }
+
+    public function getDetectionTestsSerialized(): array {
+        $detectionTests = $this->getDetectionTests();
+        $detectionTestsSerialized = [];
+
+        foreach($detectionTests as $detectionTest) {
+            $detectionTestsSerialized[] = $detectionTest->jsonSerializeLight();
+        }
+
+        return $detectionTestsSerialized;
     }
 
     public function addDetectionTest(DetectionTest $detectionTest): self

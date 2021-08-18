@@ -65,6 +65,19 @@ class DetectionTest
         );
     }
 
+    public function jsonSerializeLight(): array {
+        return array(
+            'id' => $this->getId(),
+            'patient' => $this->getPatient()->jsonSerializeLight(),
+            'testedAt' => $this->getTestedAt(),
+            'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s'))),
+            'isInvoiced' => $this->getIsInvoiced(),
+            'filledAt' => $this->getFilledAt(),
+            'filledAtFrench' => $this->getFilledAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))) : null,
+            'patient' => $this->getPatient()->jsonSerializeLight(),
+        );
+    }
+
     public function getId(): ?int
     {
         return $this->id;
