@@ -45,6 +45,9 @@ class UsersService extends AbstractRestService {
                 $this->verifyMandatoryFields($mandatory, $data);
                 $this->verifyMailFormat($data['email']);
                 $this->verifyUniqueMail($data['email']);
+
+                $data['firstName'] = ucfirst(strtolower($data['firstName']));
+                $data['lastName'] = strtoupper($data['lastName']);
                 $data['password'] = md5(random_bytes(10));
                 $data['password'] = $this->passwordHasher->hashPassword(new Users, $data['password']);
                 $data['createdAt'] = date_format(date_create('now'),  'Y-m-d H:i:s');
