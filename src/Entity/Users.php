@@ -63,9 +63,25 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $phone;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class, inversedBy="users")
+     */
+    private $createdBy;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Users::class, mappedBy="createdBy")
+     */
+    private $users;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isFirstConnection = true;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function jsonSerialize(): array {
@@ -78,6 +94,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'roles' => $this->getRoles(),
             'createdAt' => date_format($this->getCreatedAt(), 'd/m/Y H:s'),
             'createdAtFrench' => $this->getCreatedAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getCreatedAt(), 'Y-m-d H:i:s'))) : null,
+            'createdBy' => $this->getCreatedBy() !== null ? $this->getCreatedBy()->jsonSerializeLight() : null,
+            'isFirstConnection' => $this->getIsFirstConnection(),
             'detectionTests' => $this->getDetectionTestsSerialized()
         );
     }
@@ -266,6 +284,60 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(string $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?self
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?self $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(self $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(self $user): self
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getCreatedBy() === $this) {
+                $user->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getIsFirstConnection(): ?bool
+    {
+        return $this->isFirstConnection;
+    }
+
+    public function setIsFirstConnection(bool $isFirstConnection): self
+    {
+        $this->isFirstConnection = $isFirstConnection;
 
         return $this;
     }

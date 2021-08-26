@@ -11,44 +11,75 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+use function Sodium\randombytes_uniform;
+
 date_default_timezone_set('Europe/Paris');
 
 class UsersService extends AbstractRestService {
     private $passwordHasher;
     private $repository;
     private $emi;
+    private $mailerService;
+    private $mailTemplateService;
 
-    public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher, NormalizerInterface $normalizer) {
+    public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher, NormalizerInterface $normalizer, MailerService $mailerService, MailTemplateService $mailTemplateService) {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->passwordHasher = $passwordHasher;
         $this->repository = $repository;
         $this->emi = $emi;
+        $this->mailerService = $mailerService;
+        $this->mailTemplateService = $mailTemplateService;
     }
 
     /**
      * @param array $data
+     * @param Users $user
      * 
      * @return array
      */
-    public function new(array $data): array {
+    public function new(array $data, Users $user): array {
         try {
-            $mandatory = ['email', 'password', 'firstName', 'lastName'];
-            $this->verifyMandatoryFields($mandatory, $data);
-            $this->verifyMailFormat($data['email']);
-            $this->verifyUniqueMail($data['email']);
-            $data['password'] = $this->passwordHasher->hashPassword(new Users, $data['password']);
-            $data['createdAt'] = date('y-d-m H:i:s', time());
+            if ($this->isAdmin($user)) {
+                $mandatory = ['email', 'phone', 'firstName', 'lastName'];
+                $this->verifyMandatoryFields($mandatory, $data);
+                $this->verifyMailFormat($data['email']);
+                $this->verifyUniqueMail($data['email']);
+                $data['password'] = md5(random_bytes(10));
+                $data['password'] = $this->passwordHasher->hashPassword(new Users, $data['password']);
+                $data['createdAt'] = date_format(date_create('now'),  'Y-m-d H:i:s');
+                $data['createdBy'] = $user->getId();
 
-            $user = $this->create($data);
+                $user = $this->create($data);
+                $this->mailerService->sendMail(
+                    $user->getEmail(),
+                    $user->getFirstName() . ', votre compte Cara Santé a été créé !',
+                    $this->mailTemplateService->getUserCreated($data)
+                );
+                
+                return $user->jsonSerialize();
+            }
 
-            return $user->jsonSerialize();
+            throw new Exception("Vous n'avez pas les droits pour créer un utilisateur");
         } catch (Exception $e) {
             return array(
                 'status' => 400,
                 'message' => $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @param Users $user
+     * 
+     * @return bool
+     */
+    public function isAdmin(Users $user): bool {
+        if (in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_SUPERADMIN', $user->getRoles())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

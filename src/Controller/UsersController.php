@@ -22,14 +22,13 @@ class UsersController extends AbstractController
     }
 
     #[Route('', name: 'users_new', methods: ['OPTIONS', 'POST'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits pour créer un utilisateur')]
     public function new(Request $request): JsonResponse
     {
         if ($request->getContentType() === 'json') {
             $data = json_decode($request->getContent(), true);
         }
         
-        $create = $this->usersService->new($data);
+        $create = $this->usersService->new($data, $this->getUser());
 
         if (!isset($create['status'])) {
             $status = 201;
