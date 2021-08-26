@@ -22,11 +22,10 @@ class UsersController extends AbstractController
     }
 
     #[Route('/{token}', name: 'users_token', methods: ['OPTIONS', 'POST', 'GET'])]
-    public function getByToken(): JsonResponse
+    public function getByToken(string $token): JsonResponse
     {
-        /*dd('here');
-        $users = $this->usersService->findAllExceptCurrent($this->getUser());
-*/
-        return new JsonResponse([], 200);
+        $user = $this->usersService->verifyTokenSetPassword($token);
+
+        return new JsonResponse($user, $user['code']);
     }
 }

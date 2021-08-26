@@ -196,6 +196,34 @@ class UsersService extends AbstractRestService {
         return $usersSerialized;
     }
 
+    public function verifyTokenSetPassword(string $token): array {
+        $user = $this->getUserByToken($token);
+
+        if ($user !== null) {
+            $user->setToken(null);
+            $this->emi->persist($user);
+            $this->emi->flush();
+
+            return array('code' => 200);
+        }
+
+        return array(
+            'code' => 400,
+            'message' => 'Cette URL est erronée. Veuillez refaire une demande'
+        );
+    }
+
+    /**
+     * @param string $token
+     * 
+     * @return Users|null
+     */
+    public function getUserByToken(string $token): Users|null {
+        return $this->repository->findOneBy(array(
+            'token' => $token
+        ));
+    }
+
     /**
      * @param array $errors
      * 
