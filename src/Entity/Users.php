@@ -78,6 +78,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $isFirstConnection = true;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $token;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
@@ -338,6 +343,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsFirstConnection(bool $isFirstConnection): self
     {
         $this->isFirstConnection = $isFirstConnection;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }

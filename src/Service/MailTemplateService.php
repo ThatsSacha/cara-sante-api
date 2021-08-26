@@ -841,7 +841,7 @@ a.es-button, button.es-button {
                     <div class="esd-delete" title="Delete">
                         <a><span class="es-icon-delete"></span></a>
                     </div>
-                </div><span class="es-button-border" style="background-color: rgb(0 184 221);"><a href="https://127.0.0.1" class="es-button es-button-1629968913941" target="_blank" style="font-weight: normal; border-width: 15px 30px; color: rgb(255, 255, 255); font-size: 18px; background-color: rgb(0 184 221); border-color: rgb(0 184 221);">Activer mon compte</a></span></td> 
+                </div><span class="es-button-border" style="background-color: rgb(0 184 221);"><a href="'. $_ENV['FRONT_URL'] . '/set-password/' . $data['token'] .'" class="es-button es-button-1629968913941" target="_blank" style="font-weight: normal; border-width: 15px 30px; color: rgb(255, 255, 255); font-size: 18px; background-color: rgb(0 184 221); border-color: rgb(0 184 221);">Activer mon compte</a></span></td> 
                      </tr> 
                     </tbody> 
                    </table></td> 

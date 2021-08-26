@@ -52,6 +52,7 @@ class UsersService extends AbstractRestService {
                 $data['password'] = $this->passwordHasher->hashPassword(new Users, $data['password']);
                 $data['createdAt'] = date_format(date_create('now'),  'Y-m-d H:i:s');
                 $data['createdBy'] = $user->getId();
+                $data['token'] = strtoupper(hash('sha256', random_bytes(30)));
 
                 $user = $this->create($data);
                 $this->mailerService->sendMail(
