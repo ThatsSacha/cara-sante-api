@@ -52,7 +52,7 @@ class UsersService extends AbstractRestService {
                 $data['password'] = $this->passwordHasher->hashPassword(new Users, $data['password']);
                 $data['createdAt'] = date_format(date_create('now'),  'Y-m-d H:i:s');
                 $data['createdBy'] = $user->getId();
-                $data['token'] = strtoupper(hash('sha256', random_bytes(30)));
+                $data['token'] = $this->generateToken();
 
                 $user = $this->create($data);
                 $this->mailerService->sendMail(
@@ -67,7 +67,7 @@ class UsersService extends AbstractRestService {
             throw new Exception("Vous n'avez pas les droits pour créer un utilisateur");
         } catch (Exception $e) {
             return array(
-                'status' => 400,
+                'status' => $e->getCode() ? $e->getCode() : 400,
                 'message' => $e->getMessage()
             );
         }
@@ -200,11 +200,14 @@ class UsersService extends AbstractRestService {
         $user = $this->getUserByToken($token);
 
         if ($user !== null) {
-            $user->setToken(null);
+            $user->setToken($this->generateToken());
             $this->emi->persist($user);
             $this->emi->flush();
 
-            return array('code' => 200);
+            return array(
+                'code' => 200,
+                'token' => $user->getToken()
+            );
         }
 
         return array(
@@ -222,6 +225,10 @@ class UsersService extends AbstractRestService {
         return $this->repository->findOneBy(array(
             'token' => $token
         ));
+    }
+
+    public function generateToken(): string {
+        return strtoupper(hash('sha256', random_bytes(30)));
     }
 
     /**
