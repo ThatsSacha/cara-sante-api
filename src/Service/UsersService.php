@@ -55,11 +55,7 @@ class UsersService extends AbstractRestService {
                 $data['token'] = $this->generateToken();
 
                 $user = $this->create($data);
-                $this->mailerService->sendMail(
-                    $user->getEmail(),
-                    $user->getFirstName() . ', votre compte Cara Santé a été créé !',
-                    $this->mailTemplateService->getUserCreated($data)
-                );
+                $this->mailNewUser($user, false, $data);
                 
                 return $user->jsonSerialize();
             }
@@ -71,6 +67,59 @@ class UsersService extends AbstractRestService {
                 'message' => $e->getMessage()
             );
         }
+    }
+
+    public function resendMailNewUser(int $id) {
+        try {
+            $user = $this->repository->findOneBy(array(
+                'id' => $id
+            ));
+    
+            if ($user !== null) {
+                if ($user->getIsFirstConnection()) {
+                    $this->mailNewUser($user, true);
+
+                    return array(
+                        'status' => 200
+                    );
+                }
+
+                throw new Exception('Vous ne pouvez pas envoyer de mail de confirmation à cet utilisateur');
+            }
+
+            throw new Exception('Une erreur s\'est produite');
+        } catch (Exception $e) {
+            return array(
+                'status' => $e->getCode() ? $e->getCode() : 400,
+                'message' => $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @param Users $user
+     * @param bool $generateAndUpdateToken
+     * @param array $data
+     * 
+     * @return void
+     * @throws Exception
+     */
+    public function mailNewUser(Users $user, bool $generateAndUpdateToken = false, array $data = []): void {
+        if ($generateAndUpdateToken) {
+            $token = $this->generateToken();
+            $user->setToken($token);
+            $data['firstName'] = $user->getFirstName();
+            $data['token'] = $user->getToken();
+
+            $this->emi->persist($user);
+            $this->emi->flush();
+        }
+
+        $this->mailerService->sendMail(
+            $user->getEmail(),
+            $user->getFirstName() . ', votre compte Cara Santé a été créé !',
+            $this->mailTemplateService->getUserCreated($data)
+        );
     }
 
     /**
@@ -244,6 +293,7 @@ class UsersService extends AbstractRestService {
                 $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
                 $user->setPassword($hashedPassword);
                 $user->setToken(null);
+                $user->setIsFirstConnection(false);
                 
                 $this->emi->persist($user);
                 $this->emi->flush();
