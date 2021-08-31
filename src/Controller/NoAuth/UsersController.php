@@ -28,4 +28,16 @@ class UsersController extends AbstractController
 
         return new JsonResponse($user, $user['code']);
     }
+
+    #[Route('/set-password/{token}', name: 'users_set_password', methods: ['OPTIONS', 'POST'])]
+    public function setToken(string $token, Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $resp = $this->usersService->setPassword($data, $token);
+
+        return new JsonResponse($resp, $resp['status']);
+    }
 }

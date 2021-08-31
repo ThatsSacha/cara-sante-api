@@ -231,6 +231,122 @@ class UsersService extends AbstractRestService {
         return strtoupper(hash('sha256', random_bytes(30)));
     }
 
+    public function setPassword(array $data, string $token) {
+        try {
+            $user = $this->getUserByToken($token);
+            
+            if ($user !== null) {
+                $mandatoryFields = ['password', 'confirmPassword'];
+                $this->verifyMandatoryFields($mandatoryFields, $data);
+                $this->verifyBothPassword($data['password'], $data['confirmPassword']);
+                $this->verifyPassword($data['password']);
+
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
+                $user->setPassword($hashedPassword);
+                $user->setToken(null);
+                
+                $this->emi->persist($user);
+                $this->emi->flush();
+
+                return array(
+                    'status' => 200
+                );
+            }
+
+            throw new Exception('Une erreur s\'est produite');
+        } catch (Exception $e) {
+            return array(
+                'status' => $e->getCode() ? $e->getCode() : 400,
+                'message' => $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @param string $password
+     * @param string $confirmPassword
+     * 
+     * @return void
+     * @throws Exception
+     */
+    public function verifyBothPassword(string $password, string $confirmPassword): void {
+        if ($password !== $confirmPassword) {
+            throw new Exception('Les deux mots de passe ne correspondent pas');
+        }
+    }
+
+    /**
+     * @param string $password
+     * 
+     * @throws Exception
+     */
+    public function verifyPassword(string $password) {
+        $verifyPasswordLength = $this->verifyPasswordLength($password);
+        $verifyPasswordNumerics = $this->verifyPasswordNumerics($password);
+        $verifyPasswordSpecialCharacters = $this->verifyPasswordSpecialCharacters($password);
+
+        if ($verifyPasswordLength || $verifyPasswordNumerics || $verifyPasswordSpecialCharacters) {
+            $this->throwError([$verifyPasswordLength, $verifyPasswordNumerics, $verifyPasswordSpecialCharacters]);
+        }
+    }
+
+    /**
+     * @param string $password
+     * 
+     * @return string|null
+     */
+    public function verifyPasswordSpecialCharacters(string $password): string|null {
+        $specialCharacters = ['@', '&', '#', '(', ')', '!', '.', '?', ',', ';', '+', '$', '*', '^', '<', '>', '§', '°', '-', '_', '=', ':'];
+
+        $numberOfSpecialCharacters = 0;
+
+        for($i = 0; $i < strlen($password); $i++) {
+            if (in_array($password[$i], $specialCharacters)) {
+                $numberOfSpecialCharacters++;
+            }
+        }
+
+        if ($numberOfSpecialCharacters < 1) {
+            return 'Le mot de passe doit être composé au minimun de 1 caractère spécial';
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $password
+     * 
+     * @return string|null
+     */
+    public function verifyPasswordNumerics(string $password): string|null {
+        $numberOfNumerics = 0;
+
+        for($i = 0; $i < strlen($password); $i++) {
+            if (is_numeric($password[$i])) {
+                $numberOfNumerics++;
+            }
+        }
+
+        if ($numberOfNumerics < 2) {
+            return 'Le mot de passe doit être composé au minimun de 2 chiffres';
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $password
+     * 
+     * @return string|null
+     */
+    public function verifyPasswordLength(string $password): string|null {
+        if (strlen($password) < 8) {
+            return 'Le mot de passe doit être composé au minimun de 8 caractères';
+        }
+
+        return null;
+    }
+
     /**
      * @param array $errors
      * 
