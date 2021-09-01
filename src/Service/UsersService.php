@@ -397,6 +397,45 @@ class UsersService extends AbstractRestService {
         return null;
     }
 
+    public function resetPassword(array $data) {
+        try {
+            $mandatoryFields = ['email'];
+            $this->verifyMandatoryFields($mandatoryFields, $data);
+            $this->verifyMailFormat($data['email']);
+    
+            $user = $this->repository->findOneBy(array(
+                'email' => $data['email']
+            ));
+            
+            if ($user !== null) {
+                $token = $this->generateToken();
+                $user->setToken($token);
+                $data['firstName'] = $user->getFirstName();
+                $data['token'] = $token;
+                $this->emi->persist($user);
+                $this->emi->flush();
+                
+        
+                $this->mailerService->sendMail(
+                    $user->getEmail(),
+                    $user->getFirstName() . ', rénitialisez votre mot de passe !',
+                    $this->mailTemplateService->getForgotPassword($data)
+                );
+            } else {
+                sleep(2);
+            }
+
+            return array(
+                'status' => 200
+            );
+        } catch (Exception $e) {
+            return array(
+                'status' => $e->getCode() ? $e->getCode() : 400,
+                'message' => $e->getMessage()
+            );
+        }
+    }
+
     /**
      * @param array $errors
      * 

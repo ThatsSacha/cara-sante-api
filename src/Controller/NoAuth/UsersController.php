@@ -21,6 +21,18 @@ class UsersController extends AbstractController
         $this->usersService = $usersService;
     }
 
+    #[Route('/forgot-password', name: 'users_forgot_password', methods: ['OPTIONS', 'POST'])]
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $resp = $this->usersService->resetPassword($data);
+
+        return new JsonResponse($resp, $resp['status']);
+    }
+
     #[Route('/{token}', name: 'users_token', methods: ['OPTIONS', 'POST', 'GET'])]
     public function getByToken(string $token): JsonResponse
     {
