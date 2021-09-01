@@ -619,9 +619,6 @@ a.es-button, button.es-button {
          <tr> 
           <td class="esd-stripe esd-frame esdev-disable-select esd-hover" align="center" esd-handler-name="stripeBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Stripe - Content
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -713,9 +710,6 @@ a.es-button, button.es-button {
              <tr class="ui-draggable"> 
               <td class="esd-structure es-p40t es-p35b es-p35r es-p35l esd-frame esdev-disable-select" style="background-color: rgb(247, 247, 247);" bgcolor="#f7f7f7" align="left" esd-handler-name="structureBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Structure
         
             </div><div class="esd-block-btn ">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -738,9 +732,6 @@ a.es-button, button.es-button {
                  <tr class="ui-draggable"> 
                   <td class="esd-container-frame esd-frame esdev-disable-select esd-hover" width="530" valign="top" align="center" esd-handler-name="containerHandler">
             <div class="esd-structure-type">
-                    
-        
-            Container
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -861,9 +852,6 @@ a.es-button, button.es-button {
          <tr> 
           <td class="esd-stripe esd-frame esdev-disable-select esd-hover" align="center" esd-handler-name="stripeBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Stripe - Footer
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -955,9 +943,6 @@ a.es-button, button.es-button {
              <tr class="ui-draggable"> 
               <td class="esd-structure es-p35t es-p40b es-p35r es-p35l esd-frame esdev-disable-select esd-hover" align="left" esd-handler-name="structureBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Structure
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -980,9 +965,6 @@ a.es-button, button.es-button {
                  <tr class="ui-draggable"> 
                   <td class="esd-container-frame esd-frame esdev-disable-select esd-hover" width="530" valign="top" align="center" esd-handler-name="containerHandler">
             <div class="esd-structure-type">
-                    
-        
-            Container
         
             </div><div class="esd-block-btn ">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -1656,9 +1638,6 @@ a.es-button, button.es-button {
          <tr> 
           <td class="esd-stripe esd-frame esdev-disable-select esd-hover" align="center" esd-handler-name="stripeBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Stripe - Content
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -1750,9 +1729,6 @@ a.es-button, button.es-button {
              <tr class="ui-draggable"> 
               <td class="esd-structure es-p40t es-p35b es-p35r es-p35l esd-frame esdev-disable-select" style="background-color: rgb(247, 247, 247);" bgcolor="#f7f7f7" align="left" esd-handler-name="structureBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Structure
         
             </div><div class="esd-block-btn ">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -1775,9 +1751,6 @@ a.es-button, button.es-button {
                  <tr class="ui-draggable"> 
                   <td class="esd-container-frame esd-frame esdev-disable-select esd-hover" width="530" valign="top" align="center" esd-handler-name="containerHandler">
             <div class="esd-structure-type">
-                    
-        
-            Container
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -1830,7 +1803,7 @@ a.es-button, button.es-button {
                     <div class="esd-delete" title="Delete">
                         <a><span class="es-icon-delete"></span></a>
                     </div>
-                </div><h2 style="color: #333333; font-family: \'open sans\', \'helvetica neue\', helvetica, arial, sans-serif;">'. $data['firstName'] .', rénitilisez votre mot de passe !</h2></td> 
+                </div><h2 style="color: #333333; font-family: \'open sans\', \'helvetica neue\', helvetica, arial, sans-serif;">'. $data['firstName'] .', rénitialisez votre mot de passe !</h2></td> 
                      </tr> 
                      <tr class="ui-draggable"> 
                       <td class="esd-block-text es-m-txt-l es-p20t esd-frame esd-draggable esd-block esd-hover esdev-disable-select" align="left" esd-handler-name="textElementHandler" contenteditable="true"><div class="esd-block-btn " contenteditable="false">
@@ -1898,9 +1871,6 @@ a.es-button, button.es-button {
          <tr> 
           <td class="esd-stripe esd-frame esdev-disable-select esd-hover" align="center" esd-handler-name="stripeBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Stripe - Footer
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -1992,9 +1962,6 @@ a.es-button, button.es-button {
              <tr class="ui-draggable"> 
               <td class="esd-structure es-p35t es-p40b es-p35r es-p35l esd-frame esdev-disable-select esd-hover" align="left" esd-handler-name="structureBlockHandler">
             <div class="esd-structure-type">
-                    
-        
-            Structure
         
             </div><div class="esd-block-btn">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
@@ -2017,9 +1984,6 @@ a.es-button, button.es-button {
                  <tr class="ui-draggable"> 
                   <td class="esd-container-frame esd-frame esdev-disable-select esd-hover" width="530" valign="top" align="center" esd-handler-name="containerHandler">
             <div class="esd-structure-type">
-                    
-        
-            Container
         
             </div><div class="esd-block-btn ">
                     <div class="esd-more"><a><span class="es-icon-dot-3"></span></a></div>
