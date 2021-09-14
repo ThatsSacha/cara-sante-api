@@ -51,6 +51,16 @@ class DetectionTest
      */
     private $ref;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isUpdating = false;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class)
+     */
+    private $updatingBy;
+
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
@@ -61,7 +71,9 @@ class DetectionTest
             'filledAt' => $this->getFilledAt(),
             'filledAtFrench' => $this->getFilledAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))) : null,
             'patient' => $this->getPatient()->jsonSerializeLight(),
-            'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight()
+            'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight(),
+            'isUpdating' => $this->getIsUpdating(),
+            'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null
         );
     }
 
@@ -75,6 +87,8 @@ class DetectionTest
             'filledAt' => $this->getFilledAt(),
             'filledAtFrench' => $this->getFilledAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))) : null,
             'patient' => $this->getPatient()->jsonSerializeLight(),
+            'isUpdating' => $this->getIsUpdating(),
+            'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null
         );
     }
 
@@ -151,6 +165,30 @@ class DetectionTest
     public function setRef(string $ref): self
     {
         $this->ref = $ref;
+
+        return $this;
+    }
+
+    public function getIsUpdating(): ?bool
+    {
+        return $this->isUpdating;
+    }
+
+    public function setIsUpdating(bool $isUpdating): self
+    {
+        $this->isUpdating = $isUpdating;
+
+        return $this;
+    }
+
+    public function getUpdatingBy(): ?Users
+    {
+        return $this->updatingBy;
+    }
+
+    public function setUpdatingBy(?Users $updatingBy): self
+    {
+        $this->updatingBy = $updatingBy;
 
         return $this;
     }
