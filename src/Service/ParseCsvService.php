@@ -35,6 +35,7 @@ class ParseCsvService {
         if (file_exists($path)) {
             try {
                 $file = file_get_contents($path);
+
                 $serializer = new Serializer(
                                 [new ObjectNormalizer()],
                                 [new CsvEncoder()]
@@ -44,7 +45,7 @@ class ParseCsvService {
                     'lines' => $serializer->decode(
                         $file,
                         'csv',
-                        [CsvEncoder::DELIMITER_KEY => ',']
+                        [CsvEncoder::DELIMITER_KEY => ';']
                     )
                 );
             } catch(Exception $e) {

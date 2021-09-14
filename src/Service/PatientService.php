@@ -86,7 +86,7 @@ class PatientService extends AbstractRestService {
                     $dateTime = $detectionTest['date_time'];
                     $mainAddress = $detectionTest['patient_main_address_address'];
 
-                    if (!empty($nir)) {
+                    if (!empty($detectionTest['patient_first_name']) && !empty($detectionTest['patient_usual_name']) && !empty($detectionTest['patient_email']) && !empty($nir)) {
                         $csvDetectionTest[$ref] = [
                             'ref' => $ref,
                             'nir' => $nir,
