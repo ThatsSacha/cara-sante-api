@@ -83,6 +83,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $token;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ref;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
@@ -92,6 +97,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'mail' => $this->getEmail(),
@@ -108,6 +114,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function jsonSerializeLight(): array {
         return array(
             'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'mail' => $this->getEmail(),
@@ -355,6 +362,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setToken(string|null $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getRef(): ?string
+    {
+        return $this->ref;
+    }
+
+    public function setRef(string $ref): self
+    {
+        $this->ref = $ref;
 
         return $this;
     }

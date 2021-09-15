@@ -53,6 +53,7 @@ class UsersService extends AbstractRestService {
                 $data['createdAt'] = date_format(date_create('now'),  'Y-m-d H:i:s');
                 $data['createdBy'] = $user->getId();
                 $data['token'] = $this->generateToken();
+                $data['ref'] = hash('crc32', time()) . '-' . uniqid() . '-' . uniqid();
 
                 $user = $this->create($data);
                 $this->mailNewUser($user, false, $data);
