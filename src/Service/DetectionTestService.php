@@ -34,10 +34,10 @@ class DetectionTestService extends AbstractRestService {
      * 
      * @return array
      */
-    public function findById(int $id): array
+    public function findByRef(string $ref): array
     {
         return $this->repository->findBy(array(
-            'id' => $id
+            'ref' => $ref
         ));
     }
 
@@ -139,11 +139,11 @@ class DetectionTestService extends AbstractRestService {
     }
 
     /**
-     * @param int $id
+     * @param string $ref
      * @param array $data
      * @param Users $user
      */
-    public function updateDetectionTest(int $id, array $data, Users $user) {
+    public function updateDetectionTest(string $ref, array $data, Users $user) {
         $data['isInvoiced'] = true;
 
         if (!isset($data['filledAt']) || empty($data['filledAt'])) {
@@ -152,9 +152,9 @@ class DetectionTestService extends AbstractRestService {
             $data['filledAt'] = date_create($data['filledAt']);
         }
 
-        $data['user'] = $user->getId();
+        $data['user'] = $user->getRef();
 
-        $detectionTest = $this->getById($id);
+        $detectionTest = $this->getByRef($ref);
 
         if (!$detectionTest->getIsInvoiced()) {
             $detectionTest->setIsInvoiced($data['isInvoiced']);

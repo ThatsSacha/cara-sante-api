@@ -69,4 +69,8 @@ abstract class AbstractRestService {
     public function getById(int $id) {
         return $this->repository->findOneBy(array('id' => $id));
     }
+
+    public function getByRef(string $ref) {
+        return $this->repository->findOneBy(array('ref' => $ref));
+    }
 }

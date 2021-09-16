@@ -50,10 +50,10 @@ class PatientService extends AbstractRestService {
      * 
      * @return array
      */
-    public function findById(int $id): array
+    public function findByRef(string $ref): array
     {
         return $this->repository->findBy(array(
-            'id' => $id
+            'ref' => $ref
         ));
     }
 
@@ -103,7 +103,8 @@ class PatientService extends AbstractRestService {
                             'zip' => $detectionTest['patient_main_address_zip'],
                             'city' => $detectionTest['patient_main_address_city'],
                             'nir' => $nir,
-                            'testedAt' => $dateTime
+                            'testedAt' => $dateTime,
+                            'ref' => hash('crc32', time()) . '-' . uniqid() . '-' . uniqid()
                         ];
                     } else {
                         $write = "\nNIR empty : $firstName $lastName - $phone - $mail";

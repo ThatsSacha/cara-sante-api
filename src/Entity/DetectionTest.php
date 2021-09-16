@@ -64,6 +64,7 @@ class DetectionTest
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'testedAt' => $this->getTestedAt(),
             'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s'))),
@@ -80,6 +81,7 @@ class DetectionTest
     public function jsonSerializeLight(): array {
         return array(
             'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'testedAt' => $this->getTestedAt(),
             'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s'))),

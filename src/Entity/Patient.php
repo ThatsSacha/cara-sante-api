@@ -69,6 +69,11 @@ class Patient
      */
     private $detectionTests;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ref;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
@@ -77,6 +82,7 @@ class Patient
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
@@ -93,6 +99,7 @@ class Patient
     public function jsonSerializeLight(): array {
         return array(
             'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
@@ -258,6 +265,18 @@ class Patient
                 $detectionTest->setPatient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRef(): ?string
+    {
+        return $this->ref;
+    }
+
+    public function setRef(string $ref): self
+    {
+        $this->ref = $ref;
 
         return $this;
     }

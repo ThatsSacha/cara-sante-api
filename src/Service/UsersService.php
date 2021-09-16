@@ -233,8 +233,8 @@ class UsersService extends AbstractRestService {
      * 
      * @return array
      */
-    public function findByExceptCurrent(int $id, Users $currentUser): array {
-        $users = $this->repository->findBy(array('id' => $id));
+    public function findByExceptCurrent(string $ref, Users $currentUser): array {
+        $users = $this->repository->findBy(array('ref' => $ref));
         $usersSerialized = [];
 
         foreach($users as $user) {

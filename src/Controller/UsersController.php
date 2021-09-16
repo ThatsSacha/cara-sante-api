@@ -67,10 +67,10 @@ class UsersController extends AbstractController
         return new JsonResponse($users, 200);
     }
 
-    #[Route('/{id}', name: 'users_detail', methods: ['OPTIONS', 'GET'])]
-    public function detail(int $id): JsonResponse
+    #[Route('/{ref}', name: 'users_detail', methods: ['OPTIONS', 'GET'])]
+    public function detail(string $ref): JsonResponse
     {
-        $users = $this->usersService->findByExceptCurrent($id, $this->getUser());
+        $users = $this->usersService->findByExceptCurrent($ref, $this->getUser());
 
         return new JsonResponse($users, 200);
     }

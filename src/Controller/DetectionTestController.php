@@ -30,10 +30,10 @@ class DetectionTestController extends AbstractController
         return new JsonResponse($detectionTests, 200);
     }
 
-    #[Route('/{id}', name: 'detection_test_show', methods: ['OPTIONS', 'GET'])]
-    public function show(int $id): JsonResponse
+    #[Route('/{ref}', name: 'detection_test_show', methods: ['OPTIONS', 'GET'])]
+    public function show(string $ref): JsonResponse
     {
-        $detectionTests = $this->service->findById($id);
+        $detectionTests = $this->service->findByRef($ref);
         $detectionTest = [];
 
         if (count($detectionTests) > 0) {
@@ -43,14 +43,14 @@ class DetectionTestController extends AbstractController
         return new JsonResponse($detectionTest, 200);
     }
 
-    #[Route('/{id}', name: 'detection_test_update', methods: ['OPTIONS', 'PUT'])]
-    public function update(int $id, Request $request): JsonResponse
+    #[Route('/{ref}', name: 'detection_test_update', methods: ['OPTIONS', 'PUT'])]
+    public function update(string $ref, Request $request): JsonResponse
     {
         if ($request->getContentType() === 'json') {
             $data = json_decode($request->getContent(), true);
         }
 
-        $detectionTests = $this->service->updateDetectionTest($id, $data, $this->getUser());
+        $detectionTests = $this->service->updateDetectionTest($ref, $data, $this->getUser());
 
         return new JsonResponse($detectionTests, $detectionTests['status']);
     }

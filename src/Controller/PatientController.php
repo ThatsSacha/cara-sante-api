@@ -55,10 +55,10 @@ class PatientController extends AbstractController
         return new JsonResponse($import, $import['status']);
     }
 
-    #[Route('/{id}', name: 'patient_show', methods: ['OPTIONS', 'GET'])]
-    public function show(int $id): JsonResponse
+    #[Route('/{ref}', name: 'patient_show', methods: ['OPTIONS', 'GET'])]
+    public function show(string $ref): JsonResponse
     {
-        $patients = $this->service->findById($id);
+        $patients = $this->service->findByRef($ref);
         $patient = [];
 
         if (count($patients) > 0) {
