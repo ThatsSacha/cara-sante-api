@@ -69,12 +69,25 @@ class DetectionTestRepository extends ServiceEntityRepository
         ));
     }
 
-    public function getStats(Users $user) {
+    public function getStatsByUser(Users $user) {
         $db = $this->getEntityManager()->getConnection();
 
         $query = 'SELECT * FROM detection_test
         WHERE is_invoiced = true
         AND user_id = ' . $user->getId() . '
+        ORDER BY filled_at DESC';
+
+        $query = $db->prepare($query);
+        $query->executeQuery();
+
+        return $query->fetchAll();
+    }
+
+    public function getStats() {
+        $db = $this->getEntityManager()->getConnection();
+
+        $query = 'SELECT * FROM detection_test
+        WHERE is_invoiced = true
         ORDER BY filled_at DESC';
 
         $query = $db->prepare($query);

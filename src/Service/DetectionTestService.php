@@ -230,11 +230,17 @@ class DetectionTestService extends AbstractRestService {
 
     /**
      * @param Users $user
+     * @param string $type
      * 
      * @return array
      */
-    public function getStats(Users $user): array {
-        $detectionTests = $this->repository->getStats($user);
+    public function getStats(Users $user, string $type): array {
+        if ($type === 'user') {
+            $detectionTests = $this->repository->getStatsByUser($user);
+        } else if ($type === 'team') {
+            $detectionTests = $this->repository->getStats($user);
+        }
+
         $detectionTestsByDate = [];
 
         if (count($detectionTests) > 0) {

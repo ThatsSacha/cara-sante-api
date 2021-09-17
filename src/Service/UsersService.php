@@ -476,11 +476,12 @@ class UsersService extends AbstractRestService {
 
     /**
      * @param Users $user
+     * @param string $type
      * 
      * @return array
      */
-    public function getStats(Users $user): array {
-        return $this->detectionTestService->getStats($user);
+    public function getStats(Users $user, string $type): array {
+        return $this->detectionTestService->getStats($user, $type);
     }
 
     /**
