@@ -30,6 +30,14 @@ class DetectionTestController extends AbstractController
         return new JsonResponse($detectionTests, 200);
     }
 
+    #[Route('/remaining', name: 'detection_test_remaining', methods: ['OPTIONS', 'GET'])]
+    public function detection_test_remaining(): JsonResponse
+    {
+        $detectionTests = $this->service->remaining();
+
+        return new JsonResponse($detectionTests, 200);
+    }
+
     #[Route('/updating', name: 'detection_test_updating', methods: ['OPTIONS', 'PUT'])]
     public function updating(Request $request): JsonResponse
     {

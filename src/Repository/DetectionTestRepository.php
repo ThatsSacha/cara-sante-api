@@ -95,4 +95,16 @@ class DetectionTestRepository extends ServiceEntityRepository
 
         return $query->fetchAll();
     }
+
+    public function getRemaining() {
+        $db = $this->getEntityManager()->getConnection();
+
+        $query = 'SELECT count(*) AS count FROM detection_test
+        WHERE filled_at IS NULL';
+
+        $query = $db->prepare($query);
+        $query->executeQuery();
+
+        return $query->fetchAll();
+    }
 }

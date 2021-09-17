@@ -264,4 +264,31 @@ class DetectionTestService extends AbstractRestService {
 
         return $detectionTestsByDate;
     }
+
+    public function remaining() {
+        $detectionTests = $this->repository->getRemaining();
+        $count = (int) $detectionTests[0]['count'];
+
+        $response = [];
+        $response['count'] = $count;
+
+        if ($count >= 15000) { $message = 'Avec de la force vous y arriverez !'; }
+        else if ($count >= 10000) { $message = 'Restez motivé(e)s !'; }
+        else if ($count >= 7000) { $message = 'Vous avancez drôlement bien en équipe !'; }
+        else if ($count >= 4000) { $message = 'Allez, on garde ce rythme, c\'est super !'; }
+        else if ($count <= 1000) { $message = 'Woaw... Les derniers 1000 tests !!'; }
+        else if ($count >= 500) { $message = 'On se rapproche drôlement de la fin...'; }
+        else if ($count >= 300) { $message = 'Aller la team vous avez bientôt fini !'; }
+        else if ($count <= 100) { $message = 'Courage, c\'est bientôt terminé !'; }
+        else if ($count <= 50) { $message = 'Aller, on lâche pas, c\'est la dernière cinquantaine de tests !'; }
+        else if ($count <= 10) { $message = 'À ce niveau c\'est du gâteau...'; }
+        else if ($count <= 5) { $message = 'Je ne vais pas faire le décompte hein... :p'; }
+        else if ($count <= 1) { $message = 'Qui saisira le dernier test...?'; }
+        else if ($count === 0) { $message = 'Bravo, vous pouvez être fière de vous !'; }
+
+        $response['message'] = $message;
+        $response['countText'] = number_format($count, 0, ' ', ' ');
+
+        return $response;
+    }
 }
