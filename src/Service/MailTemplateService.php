@@ -1000,7 +1000,7 @@ a.es-button, button.es-button {
                     <div class="esd-delete" title="Delete">
                         <a><span class="es-icon-delete"></span></a>
                     </div>
-                </div><p style="color: #777777; font-size: 12px;">Vous recevez ce mail car un administrateur de l\'application https://app.carasante.com a renseigné votre adresse à la création d\'un nouvel utilisateur.</p></td> 
+                </div><p style="color: #777777; font-size: 12px;">Vous recevez ce mail car un administrateur de l\'application '. $_ENV['FRONT_URL'] .' a renseigné votre adresse à la création d\'un nouvel utilisateur.</p></td> 
                      </tr> 
                     </tbody> 
                    </table></td> 
@@ -2019,7 +2019,7 @@ a.es-button, button.es-button {
                     <div class="esd-delete" title="Delete">
                         <a><span class="es-icon-delete"></span></a>
                     </div>
-                </div><p style="color: #777777; font-size: 12px;">Vous recevez ce mail car un administrateur de l\'application https://app.carasante.com a renseigné votre adresse à la création d\'un nouvel utilisateur.</p></td> 
+                </div><p style="color: #777777; font-size: 12px;">Vous recevez ce mail car un administrateur de l\'application '. $_ENV['FRONT_URL'] .' a renseigné votre adresse à la création d\'un nouvel utilisateur.</p></td> 
                      </tr> 
                     </tbody> 
                    </table></td> 
