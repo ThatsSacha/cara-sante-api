@@ -6,6 +6,7 @@ use App\Entity\Users;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DetectionTestRepository;
+use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -225,5 +226,36 @@ class DetectionTestService extends AbstractRestService {
         }
 
         return $detectionTestsSerialized;
+    }
+
+    /**
+     * @param Users $user
+     * 
+     * @return array
+     */
+    public function getStats(Users $user): array {
+        $detectionTests = $this->repository->getStats($user);
+        $detectionTestsByDate = [];
+
+        if (count($detectionTests) > 0) {
+            foreach($detectionTests as $detectionTest) {
+                $detectionTest['filled_at'] = date_format(date_create($detectionTest['filled_at']), 'd-m-Y');
+                $today = date_format(date_create(), 'd-m-Y');
+                $dateText = '';
+    
+                if ($detectionTest['filled_at'] === $today) {
+                    $dateText = 'Aujourd\'hui';
+                } else if ($detectionTest['filled_at'] === date_format(date_modify(date_create(), '- 1 day'), 'd-m-Y')) {
+                    $dateText = 'Hier';
+                } else {
+                    $dateText = 'Le ' . date_format(date_create($detectionTest['filled_at']), 'd/m');
+                }
+    
+                $detectionTestsByDate[$detectionTest['filled_at']]['dateText'] = $dateText;
+                $detectionTestsByDate[$detectionTest['filled_at']]['object'][] = $detectionTest;
+            }
+        }
+
+        return $detectionTestsByDate;
     }
 }

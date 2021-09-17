@@ -21,8 +21,18 @@ class UsersService extends AbstractRestService {
     private $emi;
     private $mailerService;
     private $mailTemplateService;
+    private $detectionTestService;
 
-    public function __construct(UsersRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, UserPasswordHasherInterface $passwordHasher, NormalizerInterface $normalizer, MailerService $mailerService, MailTemplateService $mailTemplateService) {
+    public function __construct(
+        UsersRepository $repository,
+        EntityManagerInterface $emi,
+        DenormalizerInterface $denormalizer,
+        UserPasswordHasherInterface $passwordHasher,
+        NormalizerInterface $normalizer,
+        MailerService $mailerService,
+        MailTemplateService $mailTemplateService,
+        DetectionTestService $detectionTestService
+    ) {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
 
         $this->passwordHasher = $passwordHasher;
@@ -30,6 +40,7 @@ class UsersService extends AbstractRestService {
         $this->emi = $emi;
         $this->mailerService = $mailerService;
         $this->mailTemplateService = $mailTemplateService;
+        $this->detectionTestService = $detectionTestService;
     }
 
     /**
@@ -461,6 +472,15 @@ class UsersService extends AbstractRestService {
                 'message' => $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @param Users $user
+     * 
+     * @return array
+     */
+    public function getStats(Users $user): array {
+        return $this->detectionTestService->getStats($user);
     }
 
     /**

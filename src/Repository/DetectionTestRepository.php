@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DetectionTest;
+use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -66,5 +67,19 @@ class DetectionTestRepository extends ServiceEntityRepository
             date_format($detectionTest->getTestedAt(), 'Y-m-d H:i'),
             $detectionTest->getIsInvoiced()
         ));
+    }
+
+    public function getStats(Users $user) {
+        $db = $this->getEntityManager()->getConnection();
+
+        $query = 'SELECT * FROM detection_test
+        WHERE is_invoiced = true
+        AND user_id = ' . $user->getId() . '
+        ORDER BY filled_at DESC';
+
+        $query = $db->prepare($query);
+        $query->executeQuery();
+
+        return $query->fetchAll();
     }
 }

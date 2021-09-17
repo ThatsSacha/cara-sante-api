@@ -39,6 +39,14 @@ class UsersController extends AbstractController
         return new JsonResponse($create, $status);
     }
 
+    #[Route('/get-stats', name: 'users_get-stats', methods: ['OPTIONS', 'GET'])]
+    public function getStats(): JsonResponse
+    {
+        $users = $this->usersService->getStats($this->getUser());
+
+        return new JsonResponse($users, 200);
+    }
+
     #[Route('/me', name: 'users_me', methods: ['OPTIONS', 'GET'])]
     public function me(): JsonResponse
     {
