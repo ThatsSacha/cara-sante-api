@@ -56,7 +56,7 @@ class UsersController extends AbstractController
 
         $me = $this->usersService->updateMe($data, $this->getUser());
 
-        return new JsonResponse($this->getUser()->jsonSerialize(), 200);
+        return new JsonResponse($me, $me['status']);
     }
 
     #[Route('/', name: 'users_all', methods: ['OPTIONS', 'GET'])]

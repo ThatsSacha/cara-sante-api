@@ -45,6 +45,7 @@ class UsersService extends AbstractRestService {
                 $this->verifyMandatoryFields($mandatory, $data);
                 $this->verifyMailFormat($data['email']);
                 $this->verifyUniqueMail($data['email']);
+                $this->verifyPhoneNumber($data['phone']);
 
                 $data['firstName'] = ucfirst(strtolower($data['firstName']));
                 $data['lastName'] = strtoupper($data['lastName']);
@@ -137,6 +138,17 @@ class UsersService extends AbstractRestService {
     }
 
     /**
+     * @param string $phone
+     * 
+     * @throws Exception
+     */
+    public function verifyPhoneNumber(string $phone) {
+        if (!is_numeric($phone) || !preg_match('/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/', $phone)) {
+            $this->throwError(["Le format du numéro de téléphone est erroné"]);
+        }
+    }
+
+    /**
      * @param string $mail
      * 
      * @throws Exception
@@ -188,25 +200,39 @@ class UsersService extends AbstractRestService {
     }
 
     public function updateMe(array $data, Users $user) {
-        $me = $this->getUserByMail($user->getEmail());
+        try {
+            $me = $this->getUserByMail($user->getEmail());
         
-        if (isset($data['firstName']) && !empty($data['firstName'])) {
-            $me->setFirstName($data['firstName']);
-        }
-        if (isset($data['lastName']) && !empty($data['lastName'])) {
-            $me->setLastName($data['lastName']);
-        }
-        if (isset($data['mail']) && !empty($data['mail'])) {
-            $this->verifyMailFormat($data['mail']);
-            $this->verifyUniqueMail($data['mail']);
-            $me->setEmail($data['mail']);
-        }
-        if (isset($data['phone']) && !empty($data['phone'])) {
-            $me->setPhone($data['phone']);
-        }
+            if (isset($data['firstName']) && !empty($data['firstName'])) {
+                $me->setFirstName($data['firstName']);
+            }
+            if (isset($data['lastName']) && !empty($data['lastName'])) {
+                $me->setLastName($data['lastName']);
+            }
+            if (isset($data['mail']) && !empty($data['mail'])) {
+                $this->verifyMailFormat($data['mail']);
+                $this->verifyUniqueMail($data['mail']);
+                $me->setEmail($data['mail']);
+            }
+    
+            if (isset($data['phone']) && !empty($data['phone'])) {
+                $this->verifyPhoneNumber($data['phone']);
+                $me->setPhone($data['phone']);
+            }
+    
+            $this->emi->persist($me);
+            $this->emi->flush();
 
-        $this->emi->persist($me);
-        $this->emi->flush();
+            return array(
+                'status' => 200,
+                'user' => $me
+            );
+        } catch (Exception $e) {
+            return array(
+                'status' => $e->getCode() ? $e->getCode() : 400,
+                'message' => $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -445,7 +471,7 @@ class UsersService extends AbstractRestService {
     public function throwError(array $errors) {
         if (count($errors) > 0) {
             $error = implode(', ', $errors);
-            throw new Exception($error);
+            throw new Exception($error, 400);
         }
     }
 }
