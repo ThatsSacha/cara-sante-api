@@ -118,7 +118,7 @@ class UsersService extends AbstractRestService {
 
         $this->mailerService->sendMail(
             $user->getEmail(),
-            $user->getFirstName() . ', votre compte Cara Santé a été créé !',
+            $user->getFirstName() . ', votre compte Liora a été créé !',
             $this->mailTemplateService->getUserCreated($data)
         );
     }

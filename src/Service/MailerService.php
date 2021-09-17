@@ -15,18 +15,16 @@ class MailerService {
     }
 
     public function sendMail(string $sendTo, string $subject, string $htmlTemplate) {
+        $mail = (new Email())
+        ->from(new Address('no-reply@liora.carasante.io', 'Liora | Cara Santé'))
+        ->to($sendTo)
+        ->subject($subject)
+        ->html($htmlTemplate);
         
-            $mail = (new Email())
-            ->from(new Address('no-reply@carasante.sacha-cohen.fr', 'Cara Santé'))
-            ->to($sendTo)
-            ->subject($subject)
-            ->html($htmlTemplate);
-
-            try  {
-                $this->mailer->send($mail);
-            } catch (Exception $e) {
-                throw new Exception('L\'utilisateur a bien été ajouté mais le mail de confirmation n\'a pas été envoyé car il s\'agit d\'une adresse mail non valide', 200);
-            }
-        
+        try  {
+            $this->mailer->send($mail);
+        } catch (Exception $e) {
+            throw new Exception('L\'utilisateur a bien été ajouté mais le mail de confirmation n\'a pas été envoyé car il s\'agit d\'une adresse mail non valide', 200);
+        }
     }
 }

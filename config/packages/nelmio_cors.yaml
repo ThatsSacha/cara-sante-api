@@ -1,6 +1,6 @@
 nelmio_cors:
     defaults:
-        allow_origin: ['*']
+        allow_origin: []
         allow_headers: []
         allow_methods: []
         forced_allow_origin_value: ~
