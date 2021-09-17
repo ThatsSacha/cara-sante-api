@@ -30,6 +30,18 @@ class DetectionTestController extends AbstractController
         return new JsonResponse($detectionTests, 200);
     }
 
+    #[Route('/updating', name: 'detection_test_updating', methods: ['OPTIONS', 'PUT'])]
+    public function updating(Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $detectionTests = $this->service->updatingDetectionTest($data, $this->getUser());
+
+        return new JsonResponse($detectionTests, $detectionTests['status']);
+    }
+
     #[Route('/{ref}', name: 'detection_test_show', methods: ['OPTIONS', 'GET'])]
     public function show(string $ref): JsonResponse
     {
@@ -51,18 +63,6 @@ class DetectionTestController extends AbstractController
         }
 
         $detectionTests = $this->service->updateDetectionTest($ref, $data, $this->getUser());
-
-        return new JsonResponse($detectionTests, $detectionTests['status']);
-    }
-
-    #[Route('/updating', name: 'detection_test_update', methods: ['OPTIONS', 'PUT'])]
-    public function updating(Request $request): JsonResponse
-    {
-        if ($request->getContentType() === 'json') {
-            $data = json_decode($request->getContent(), true);
-        }
-
-        $detectionTests = $this->service->updatingDetectionTest($data, $this->getUser());
 
         return new JsonResponse($detectionTests, $detectionTests['status']);
     }
