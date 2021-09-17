@@ -54,4 +54,16 @@ class DetectionTestController extends AbstractController
 
         return new JsonResponse($detectionTests, $detectionTests['status']);
     }
+
+    #[Route('/updating', name: 'detection_test_update', methods: ['OPTIONS', 'PUT'])]
+    public function updating(Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $detectionTests = $this->service->updatingDetectionTest($data, $this->getUser());
+
+        return new JsonResponse($detectionTests, $detectionTests['status']);
+    }
 }

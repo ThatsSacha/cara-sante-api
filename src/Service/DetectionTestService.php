@@ -176,6 +176,37 @@ class DetectionTestService extends AbstractRestService {
     }
 
     /**
+     * @param array $data
+     * @param Users $user
+     */
+    public function updatingDetectionTest(array $data, Users $user) {
+        if ($data['isUpdating']) {
+            $data['updatingById'] = $user->getId();
+        } else {
+            $data['updatingById'] = null;
+        }
+        
+        $detectionTest = $this->getByRef($data['ref']);
+
+        if (!$detectionTest->getIsUpdating() || $detectionTest->getUpdatingBy()->getRef() === $user->getRef()) {
+            $detectionTest->setIsUpdating($data['isUpdating']);
+            $detectionTest->setUpdatingBy($user);
+            $this->emi->persist($detectionTest);
+            $this->emi->flush();
+
+            return array(
+                'status' => 200,
+                $detectionTest->jsonSerialize()
+            );
+        }
+
+        return array(
+            'status' => 400,
+            'message' => 'Ce test est en cours saisit'
+        );
+    }
+
+    /**
      * @param Users $user
      * 
      * @return array
