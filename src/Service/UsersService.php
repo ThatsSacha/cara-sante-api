@@ -70,10 +70,10 @@ class UsersService extends AbstractRestService {
         }
     }
 
-    public function resendMailNewUser(int $id) {
+    public function resendMailNewUser(string $ref) {
         try {
             $user = $this->repository->findOneBy(array(
-                'id' => $id
+                'ref' => $ref
             ));
     
             if ($user !== null) {

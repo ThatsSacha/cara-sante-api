@@ -75,10 +75,10 @@ class UsersController extends AbstractController
         return new JsonResponse($users, 200);
     }
 
-    #[Route('/resend-confirmation/{id}', name: 'users_resend-confirmation', methods: ['OPTIONS', 'GET'])]
-    public function resendConfirmation(int $id): JsonResponse
+    #[Route('/resend-confirmation/{ref}', name: 'users_resend-confirmation', methods: ['OPTIONS', 'GET'])]
+    public function resendConfirmation(string $ref): JsonResponse
     {
-        $users = $this->usersService->resendMailNewUser($id);
+        $users = $this->usersService->resendMailNewUser($ref);
 
         return new JsonResponse($users, $users['status']);
     }
