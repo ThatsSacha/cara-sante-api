@@ -75,7 +75,7 @@ class UsersController extends AbstractController
         return new JsonResponse($me, $me['status']);
     }
 
-    #[Route('/', name: 'users_all', methods: ['OPTIONS', 'GET'])]
+    #[Route('/all', name: 'users_all', methods: ['OPTIONS', 'GET'])]
     public function all(): JsonResponse
     {
         $users = $this->usersService->findAllExceptCurrent($this->getUser());
