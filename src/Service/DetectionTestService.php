@@ -183,9 +183,12 @@ class DetectionTestService extends AbstractRestService {
     public function updateDetectionTestFromImport(array $data) {
         foreach($data as $detectionTestData) {
             $detectionTest = $this->getByRef($detectionTestData['ref']);
-            $detectionTest->setIsNegative($detectionTestData['isNegative']);
+
+            if (count($detectionTest) > 0) {
+                $detectionTest->setIsNegative($detectionTestData['isNegative']);
     
-            $this->emi->persist($detectionTest);
+                $this->emi->persist($detectionTest);
+            }
         }
 
         $this->emi->flush();
