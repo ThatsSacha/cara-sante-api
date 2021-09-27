@@ -59,17 +59,18 @@ class PatientService extends AbstractRestService {
 
     /**
      * @param bool $import
+     * @param string|null $update
      * @param UploadedFile $file
      * 
      * @return array
      */
-    public function createPatient(bool $import, UploadedFile $file): array {
+    public function createPatient(bool $import, string|null $update, UploadedFile $file): array {
         try {
             $path = './uploads/csv';
             $fileName = $this->uploadFileService->upload($file, $path, ['csv']);
             $detectionTests = $this->parseCsvService->parseCsvToArray($fileName, $path)['lines'];
 
-            if ($import) {
+            if ($import || $update !== null) {
                 $csvDetectionTest = [];
                 $csvNir = [];
                 // Empty last time write in file do prevent double values
@@ -85,12 +86,14 @@ class PatientService extends AbstractRestService {
                     $ref= $detectionTest[' ref'];
                     $dateTime = $detectionTest['date_time'];
                     $mainAddress = $detectionTest['patient_main_address_address'];
+                    $isNegative = $detectionTest['result'] === 'N' ? true : false;
 
                     if (!empty($detectionTest['patient_first_name']) && !empty($detectionTest['patient_usual_name']) && !empty($detectionTest['patient_email']) && !empty($nir)) {
                         $csvDetectionTest[$ref] = [
                             'ref' => $ref,
                             'nir' => $nir,
-                            'testedAt' => $dateTime
+                            'testedAt' => $dateTime,
+                            'isNegative' => $isNegative
                         ];
 
                         $csvNir[$detectionTest['patient_nir']] = [
@@ -112,8 +115,15 @@ class PatientService extends AbstractRestService {
                     }
                 }
 
-                $createdPatients = $this->createPatients($csvNir);
-                $this->detectionTestService->createDetectionTests($csvDetectionTest, $createdPatients[1]);
+                if ($update !== null) {
+                    if ($update === 'patient') {}
+                    else if ($update === 'detectionTest') {
+                        $this->detectionTestService->updateDetectionTestFromImport($csvDetectionTest);
+                    }
+                } else if ($import) {
+                    $createdPatients = $this->createPatients($csvNir);
+                    $this->detectionTestService->createDetectionTests($csvDetectionTest, $createdPatients[1]);
+                }
             } else {
                 $this->parseCsvService->writeToResult($detectionTests);
             }

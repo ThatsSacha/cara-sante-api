@@ -161,6 +161,7 @@ class DetectionTestService extends AbstractRestService {
             $detectionTest->setIsInvoiced($data['isInvoiced']);
             $detectionTest->setFilledAt($data['filledAt']);
             $detectionTest->setUser($user);
+
             $this->emi->persist($detectionTest);
             $this->emi->flush();
 
@@ -174,6 +175,26 @@ class DetectionTestService extends AbstractRestService {
             'status' => 400,
             'message' => 'Ce test a déjà été saisit'
         );
+    }
+
+    /**
+     * @param array $data
+     */
+    public function updateDetectionTestFromImport(array $data) {
+        foreach($data as $detectionTestData) {
+            $detectionTest = $this->getByRef($detectionTestData['ref']);
+            $detectionTest->setIsNegative($detectionTestData['isNegative']);
+    
+            $this->emi->persist($detectionTest);
+        }
+
+        $this->emi->flush();
+        
+        return array(
+            'status' => 200,
+            $detectionTest->jsonSerialize()
+        );
+        
     }
 
     /**
@@ -192,6 +213,8 @@ class DetectionTestService extends AbstractRestService {
         if (!$detectionTest->getIsUpdating() || $detectionTest->getUpdatingBy()->getRef() === $user->getRef()) {
             $detectionTest->setIsUpdating($data['isUpdating']);
             $detectionTest->setUpdatingBy($user);
+            $detectionTest->setStartUpdating(date_create());
+
             $this->emi->persist($detectionTest);
             $this->emi->flush();
 

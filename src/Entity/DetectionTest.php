@@ -61,12 +61,23 @@ class DetectionTest
      */
     private $updatingBy;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isNegative;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $startUpdating;
+
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'testedAt' => $this->getTestedAt(),
+            'isNegative' => $this->getIsNegative(),
             'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s'))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
@@ -84,6 +95,7 @@ class DetectionTest
             'ref' => $this->getRef(),
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'testedAt' => $this->getTestedAt(),
+            'isNegative' => $this->getIsNegative(),
             'frenchTestedAt' => strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s'))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
@@ -191,6 +203,30 @@ class DetectionTest
     public function setUpdatingBy(?Users $updatingBy): self
     {
         $this->updatingBy = $updatingBy;
+
+        return $this;
+    }
+
+    public function getIsNegative(): ?bool
+    {
+        return $this->isNegative;
+    }
+
+    public function setIsNegative(?bool $isNegative): self
+    {
+        $this->isNegative = $isNegative;
+
+        return $this;
+    }
+
+    public function getStartUpdating(): ?\DateTimeInterface
+    {
+        return $this->startUpdating;
+    }
+
+    public function setStartUpdating(?\DateTimeInterface $startUpdating): self
+    {
+        $this->startUpdating = $startUpdating;
 
         return $this;
     }

@@ -26,3 +26,4 @@
 ###< lexik/jwt-authentication-bundle ###
 
 public/uploads/csv/*
+/public/uploads/*.log
