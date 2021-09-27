@@ -83,6 +83,14 @@ class UsersController extends AbstractController
         return new JsonResponse($users, 200);
     }
 
+    #[Route('/desactivate/{ref}', name: 'users_desactivate', methods: ['OPTIONS', 'GET'])]
+    public function desactivate(string $ref): JsonResponse
+    {
+        $users = $this->usersService->desactivate($ref, $this->getUser());
+
+        return new JsonResponse($users, $users['status']);
+    }
+
     #[Route('/{ref}', name: 'users_detail', methods: ['OPTIONS', 'GET'])]
     public function detail(string $ref): JsonResponse
     {

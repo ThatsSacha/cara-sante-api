@@ -23,7 +23,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true, nullable=true)
      */
     private $email;
 
@@ -59,7 +59,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private $detectionTests;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $phone;
 
@@ -88,6 +88,21 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $ref;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isDesactivated = false;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $desactivatedAt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class)
+     */
+    private $desactivatedBy;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
@@ -107,6 +122,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'createdAtFrench' => $this->getCreatedAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getCreatedAt(), 'Y-m-d H:i:s'))) : null,
             'createdBy' => $this->getCreatedBy() !== null ? $this->getCreatedBy()->jsonSerializeLight() : null,
             'isFirstConnection' => $this->getIsFirstConnection(),
+            'isDesactivated' => $this->getIsDesactivated(),
+            'desactivatedAt' => $this->getDesactivatedAt(),
+            'desactivatedBy' => $this->getDesactivatedBy() === null ? null : $this->getDesactivatedBy()->jsonSerializeLight(),
             'detectionTests' => $this->getDetectionTestsSerialized()
         );
     }
@@ -118,7 +136,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'mail' => $this->getEmail(),
-            'roles' => $this->getRoles()
+            'roles' => $this->getRoles(),
+            'isFirstConnection' => $this->getIsFirstConnection(),
+            'isDesactivated' => $this->getIsDesactivated(),
+            'desactivatedAt' => $this->getDesactivatedAt()
         );
     }
 
@@ -132,7 +153,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(string|null $email): self
     {
         $this->email = $email;
 
@@ -293,7 +314,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->phone;
     }
 
-    public function setPhone(string $phone): self
+    public function setPhone(string|null $phone): self
     {
         $this->phone = $phone;
 
@@ -374,6 +395,42 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRef(string $ref): self
     {
         $this->ref = $ref;
+
+        return $this;
+    }
+
+    public function getIsDesactivated(): ?bool
+    {
+        return $this->isDesactivated;
+    }
+
+    public function setIsDesactivated(bool $isDesactivated): self
+    {
+        $this->isDesactivated = $isDesactivated;
+
+        return $this;
+    }
+
+    public function getDesactivatedAt(): ?\DateTimeInterface
+    {
+        return $this->desactivatedAt;
+    }
+
+    public function setDesactivatedAt(?\DateTimeInterface $desactivatedAt): self
+    {
+        $this->desactivatedAt = $desactivatedAt;
+
+        return $this;
+    }
+
+    public function getDesactivatedBy(): ?self
+    {
+        return $this->desactivatedBy;
+    }
+
+    public function setDesactivatedBy(?self $desactivatedBy): self
+    {
+        $this->desactivatedBy = $desactivatedBy;
 
         return $this;
     }

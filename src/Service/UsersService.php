@@ -484,6 +484,63 @@ class UsersService extends AbstractRestService {
         return $this->detectionTestService->getStats($user, $type);
     }
 
+    public function desactivate(string $ref, Users $user) {
+        try {
+            if ($this->isAdmin($user)) {
+                $userToDesactivate = $this->getByRef($ref);
+
+                if ($userToDesactivate !== null) {
+                    $userSerialized = $user->jsonSerialize();
+                    $detectionTestNumber = count($userSerialized['detectionTests']);
+                    
+                    if ($detectionTestNumber > 0) {
+                        $sentence = 'Vous avez largement contribué(e) à notre développement et nous vous en remerciont !<br/><strong>Vous avez au total saisit '. $detectionTestNumber .' tests Covid !</strong>';
+                    } else {
+                        $sentence = 'Vous avez largement contribué(e) à notre développement et nous vous en remerciont !';
+                    }
+
+                    $this->mailerService->sendMail(
+                        $userToDesactivate->getEmail(),
+                        'C\'est l\'heure de se dire au revoir...',
+                        $this->mailTemplateService->getDesactivateAccount($userToDesactivate->getFirstName(), $sentence)
+                    );
+
+                    $this->anonymiseUser($userToDesactivate, $user);
+
+                    return array(
+                        'status' => 200
+                    );
+                } else {
+                    throw new Exception('Cet utilisateur est introuvable.');
+                }
+            } else {
+                throw new Exception('Vous devez être administrateur pour pouvoir désactiver un compte.');
+            }
+        } catch (Exception $e) {
+            return array(
+                'status' => $e->getCode() ? $e->getCode() : 400,
+                'message' => $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * @param Users $userToDesactivate
+     * @param Users $userDesactivating
+     * 
+     * @return void
+     */
+    public function anonymiseUser(Users $userToDesactivate, Users $userDesactivating): void {
+        $userToDesactivate->setEmail(null);
+        $userToDesactivate->setPhone(null);
+        $userToDesactivate->setDesactivatedAt(date_create());
+        $userToDesactivate->setDesactivatedBy($userDesactivating);
+        $userToDesactivate->setIsDesactivated(true);
+
+        $this->emi->persist($userToDesactivate);
+        $this->emi->flush();
+    }
+
     /**
      * @param array $errors
      * 
