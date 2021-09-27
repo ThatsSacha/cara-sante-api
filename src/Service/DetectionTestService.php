@@ -184,7 +184,7 @@ class DetectionTestService extends AbstractRestService {
         foreach($data as $detectionTestData) {
             $detectionTest = $this->getByRef($detectionTestData['ref']);
 
-            if (count($detectionTest) > 0) {
+            if ($detectionTest !== null) {
                 $detectionTest->setIsNegative($detectionTestData['isNegative']);
     
                 $this->emi->persist($detectionTest);
