@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Cron\Controller;
+namespace App\Controller\Cron;
 
 use App\Service\CronService;
 use Symfony\Component\Routing\Annotation\Route;
