@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
-use App\Service\DetectionTestService;
 use App\Service\PatientService;
+use App\Service\DetectionTestService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,7 +58,7 @@ class PatientController extends AbstractController
     }
 
     #[Route('/{ref}', name: 'patient_show', methods: ['OPTIONS', 'GET'])]
-    public function show(string $ref): JsonResponse
+    public function show(string $ref): Response
     {
         $patients = $this->service->findByRef($ref);
         $patient = [];
@@ -66,6 +67,6 @@ class PatientController extends AbstractController
             $patient = $patients[0]->jsonSerialize();
         }
 
-        return new JsonResponse($patient, 200);
+        return new Response(json_encode($patient, JSON_UNESCAPED_UNICODE));
     }
 }
