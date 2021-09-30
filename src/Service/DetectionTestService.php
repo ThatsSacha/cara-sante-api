@@ -200,9 +200,9 @@ class DetectionTestService extends AbstractRestService {
 
     /**
      * @param array $data
-     * @param Users $user
+     * @param Users|null $user
      */
-    public function updatingDetectionTest(array $data, Users $user) {
+    public function updatingDetectionTest(array $data, Users|null $user) {
         if ($data['isUpdating']) {
             $data['updatingById'] = $user->getId();
         } else {
@@ -229,6 +229,24 @@ class DetectionTestService extends AbstractRestService {
             'status' => 400,
             'message' => 'Ce test est en cours saisit'
         );
+    }
+
+    public function cronSetUpdating(): void {
+        $detectionTests = $this->repository->findBy(array(
+            'isInvoiced' => false,
+            'isUpdating' => true
+        ));
+
+        if (count($detectionTests) > 0) {
+            foreach($detectionTests as $detectionTest) {
+                $detectionTest->setIsUpdating(false);
+                $detectionTest->setUpdatingBy(null);
+
+                $this->emi->persist($detectionTest);
+            }
+
+            $this->emi->flush();
+        }
     }
 
     /**

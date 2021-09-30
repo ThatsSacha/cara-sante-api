@@ -18,13 +18,17 @@ class SaveDatabaseController extends AbstractController
     }
 
     #[Route('/save-db/{token}', name: 'cron_save_db', methods: ['OPTIONS', 'GET'])]
-    public function update(string $token): JsonResponse
+    public function saveDb(string $token): JsonResponse
     {
-        /*if ($request->getContentType() === 'json') {
-            $data = json_decode($request->getContent(), true);
-        }*/
-
         $status = $this->service->saveDatabase($token);
+
+        return new JsonResponse([], $status);
+    }
+
+    #[Route('/detection-test/set-updating/{token}', name: 'cron_set-updating', methods: ['OPTIONS', 'GET'])]
+    public function setUpdating(string $token): JsonResponse
+    {
+        $status = $this->service->setUpdating($token);
 
         return new JsonResponse([], $status);
     }
