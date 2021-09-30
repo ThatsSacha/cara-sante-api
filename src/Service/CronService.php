@@ -4,9 +4,11 @@ namespace App\Service;
 
 class CronService {
     private $mailerService;
+    private $mailTemplateService;
 
-    public function __construct(MailerService $mailerService) {
+    public function __construct(MailerService $mailerService, MailTemplateService $mailTemplateService) {
         $this->mailerService = $mailerService;
+        $this->mailTemplateService = $mailTemplateService;
     }
 
     public function saveDatabase(string $token) {
@@ -20,7 +22,7 @@ class CronService {
             $this->mailerService->sendMail(
                 'contact@sacha-cohen.fr',
                 'Sauvegarde base de données Cara Santé',
-                '<h1>Coucou</h1>',
+                $this->mailTemplateService->getSaveDatabase(),
                 $_ENV['DB_FILE_NAME']
             );
 
