@@ -103,6 +103,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $desactivatedBy;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastLogin;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
@@ -125,6 +130,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'isDesactivated' => $this->getIsDesactivated(),
             'desactivatedAt' => $this->getDesactivatedAt(),
             'desactivatedBy' => $this->getDesactivatedBy() === null ? null : $this->getDesactivatedBy()->jsonSerializeLight(),
+            'lastLoginFrench' => $this->getLastLogin() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s'))) : null,
             'detectionTests' => $this->getDetectionTestsSerialized()
         );
     }
@@ -139,7 +145,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'roles' => $this->getRoles(),
             'isFirstConnection' => $this->getIsFirstConnection(),
             'isDesactivated' => $this->getIsDesactivated(),
-            'desactivatedAt' => $this->getDesactivatedAt()
+            'desactivatedAt' => $this->getDesactivatedAt(),
+            'lastLoginFrench' => $this->getLastLogin() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s'))) : null
         );
     }
 
@@ -431,6 +438,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDesactivatedBy(?self $desactivatedBy): self
     {
         $this->desactivatedBy = $desactivatedBy;
+
+        return $this;
+    }
+
+    public function getLastLogin(): ?\DateTimeInterface
+    {
+        return $this->lastLogin;
+    }
+
+    public function setLastLogin(?\DateTimeInterface $lastLogin): self
+    {
+        $this->lastLogin = $lastLogin;
 
         return $this;
     }

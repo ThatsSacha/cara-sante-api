@@ -541,6 +541,12 @@ class UsersService extends AbstractRestService {
         $this->emi->flush();
     }
 
+    public function setLastLogin(Users $user): void {
+        $user->setLastLogin(date_create());
+        $this->emi->persist($user);
+        $this->emi->flush();
+    }
+
     /**
      * @param array $errors
      * 
