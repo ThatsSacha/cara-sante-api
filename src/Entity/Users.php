@@ -130,7 +130,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'isDesactivated' => $this->getIsDesactivated(),
             'desactivatedAt' => $this->getDesactivatedAt(),
             'desactivatedBy' => $this->getDesactivatedBy() === null ? null : $this->getDesactivatedBy()->jsonSerializeLight(),
-            'lastLoginFrench' => $this->getLastLogin() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s'))) : null,
+            'lastLoginFrench' => $this->getLastLogin() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s')))) : null,
             'detectionTests' => $this->getDetectionTestsSerialized()
         );
     }
