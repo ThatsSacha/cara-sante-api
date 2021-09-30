@@ -81,7 +81,7 @@ class DetectionTest
             'frenchTestedAt' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s')))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
-            'filledAtFrench' => $this->getFilledAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))) : null,
+            'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
@@ -99,7 +99,7 @@ class DetectionTest
             'frenchTestedAt' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s')))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
-            'filledAtFrench' => $this->getFilledAt() !== null ? strftime('%A %d %B %G à %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s'))) : null,
+            'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null
