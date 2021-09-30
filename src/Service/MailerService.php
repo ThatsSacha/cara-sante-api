@@ -14,14 +14,18 @@ class MailerService {
         $this->mailer = $mailer;
     }
 
-    public function sendMail(string $sendTo, string $subject, string $htmlTemplate) {
+    public function sendMail(string $sendTo, string $subject, string $htmlTemplate, ?string $file = null) {
         $mail = (new Email())
         ->from(new Address('no-reply@liora.carasante.io', 'Liora | Cara Santé'))
         ->to($sendTo)
         ->subject($subject)
         ->html($htmlTemplate);
+
+        if ($file !== null) {
+            $mail->attachFromPath($file);
+        }
         
-        try  {
+        try {
             $this->mailer->send($mail);
         } catch (Exception $e) {
             throw new Exception('L\'utilisateur a bien été ajouté mais le mail de confirmation n\'a pas été envoyé car il s\'agit d\'une adresse mail non valide', 200);

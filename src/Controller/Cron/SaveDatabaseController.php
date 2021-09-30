@@ -24,8 +24,8 @@ class SaveDatabaseController extends AbstractController
             $data = json_decode($request->getContent(), true);
         }*/
 
-        $detectionTests = $this->service->saveDatabase($token);
+        $status = $this->service->saveDatabase($token);
 
-        return new JsonResponse($detectionTests, $detectionTests['status']);
+        return new JsonResponse([], $status);
     }
 }
