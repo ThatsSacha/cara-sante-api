@@ -145,8 +145,6 @@ class DetectionTestService extends AbstractRestService {
      * @param Users $user
      */
     public function updateDetectionTest(string $ref, array $data, Users $user) {
-        $data['isInvoiced'] = true;
-
         if (!isset($data['filledAt']) || empty($data['filledAt'])) {
             $data['filledAt'] = date_create();
         } else {
