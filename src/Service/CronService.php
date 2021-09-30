@@ -21,8 +21,10 @@ class CronService {
                 'contact@sacha-cohen.fr',
                 'Sauvegarde base de données Cara Santé',
                 '<h1>Coucou</h1>',
-                '/' . $_ENV['DB_FILE_NAME']
+                $_ENV['DB_FILE_NAME']
             );
+
+            shell_exec('rm ' . $_ENV['DB_FILE_NAME']);
 
             return 200;
         } else {
