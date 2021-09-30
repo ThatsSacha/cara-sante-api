@@ -6,6 +6,6 @@ nelmio_cors:
         forced_allow_origin_value: ~
     paths:
         '^/':
-            allow_origin: ['https://preprod.carasante.io', '*']
+            allow_origin: ['%env(CORS_AUTHORIZATION)%']
             allow_headers: ['Origin', 'Content-Type', 'Authorization']
             allow_methods: ['OPTIONS', 'POST', 'GET', 'PUT', 'DELETE']
