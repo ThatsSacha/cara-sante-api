@@ -14,7 +14,7 @@ class MailerService {
         $this->mailer = $mailer;
     }
 
-    public function sendMail(string $sendTo, string $subject, string $htmlTemplate, ?string $file = null) {
+    public function sendMail(string $sendTo, string $subject, string $htmlTemplate, ?string $file = null, ?string $replyTo = null) {
         $mail = (new Email())
         ->from(new Address('no-reply@liora.carasante.io', 'Liora | Cara Santé'))
         ->to($sendTo)
@@ -23,6 +23,10 @@ class MailerService {
 
         if ($file !== null) {
             $mail->attachFromPath($file);
+        }
+
+        if ($replyTo!== null) {
+            $mail->addReplyTo($replyTo);
         }
         
         try {
