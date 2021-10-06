@@ -4891,7 +4891,7 @@ a.es-button, button.es-button {
                     <div class="esd-delete" title="Delete">
                         <a><span class="es-icon-delete"></span></a>
                     </div>
-                </div><p style="font-size: 16px; color: #777777;">Sujet : '. $data['subject'] .'</p><br/><br/><p style="font-size: 16px; color: #777777;">Message : <br/><em>'. $data['subject'] .'</em></p></td>
+                </div><p style="font-size: 16px; color: #777777;">Sujet : '. $data['subject'] .'</p><br/><br/><p style="font-size: 16px; color: #777777;">Message : <br/><em>'. $data['message'] .'</em></p></td>
                 </div></td>
                      </tr> 
                      <tr class="ui-draggable"> 
