@@ -10,20 +10,33 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class SearchService extends AbstractRestService {
     private $patientRepository;
-    private $ser;
+    private $serializer;
 
-    public function __construct(PatientRepository $patientRepository, SerializerInterface $ser)
+    public function __construct(PatientRepository $patientRepository, SerializerInterface $serializer)
     {
         $this->patientRepository = $patientRepository;
-        $this->ser = $ser;
+        $this->serializer = $serializer;
     }
-    public function search(array $data, Users $user) {
+
+    /**
+     * @param array $data
+     * @param Users $user
+     * 
+     * @return array
+     */
+    public function search(array $data, Users $user): array {
         $patients = $this->patientRepository->search($data['search']);
+        $resp = array('status' => 200, 'results' => []);
 
         if (count($patients) > 0) {
-            $patients[0]['id'] = (int) $patients[0]['id'];
-            //dd($patients[0]);
-            dd($this->ser->deserialize(json_encode($patients[0]), 'App\Entity\Patient', 'json'));
+            foreach($patients as $patient) {
+                $patient['id'] = (int) $patient['id'];
+                $patientSerialized = $this->serializer->deserialize(json_encode($patient), 'App\Entity\Patient', 'json');
+                
+                array_push($resp['results'], $patientSerialized->jsonSerialize());
+            }
         }
+
+        return $resp;
     }
 }
