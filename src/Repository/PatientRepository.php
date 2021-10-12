@@ -60,20 +60,34 @@ class PatientRepository extends ServiceEntityRepository
         return $d->fetchAll();
     }
 
-    /*public function create(Patient $patient) {
+    /**
+     * @param string $value
+     * 
+     * @return array
+     */
+    public function search(string $value): array
+    {
         $db = $this->getEntityManager()->getConnection();
-        $query = 'INSERT INTO patient (first_name, last_name, mail, phone, birth, street, zip, city, nir) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $query = 'SELECT * FROM patient WHERE
+            first_name LIKE :value
+        OR
+            last_name LIKE :value
+        OR
+            mail LIKE :value
+        OR
+            nir LIKE :value
+        OR
+            zip LIKE :value
+        OR
+            city LIKE :value
+        ';
+
         $d = $db->prepare($query);
         $d->executeQuery(array(
-            $patient->getFirstName(),
-            $patient->getLastName(),
-            $patient->getMail(),
-            $patient->getPhone(),
-            date_format($patient->getBirth(), 'Y-m-d'),
-            $patient->getStreet(),
-            $patient->getZip(),
-            $patient->getCity(),
-            $patient->getNir()
-        ));
-    }*/
+                ':value' => '%' . $value . '%'
+            )
+        );
+
+        return $d->fetchAll();
+    }
 }
