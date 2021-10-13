@@ -131,7 +131,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'desactivatedAt' => $this->getDesactivatedAt(),
             'desactivatedBy' => $this->getDesactivatedBy() === null ? null : $this->getDesactivatedBy()->jsonSerializeLight(),
             'lastLoginFrench' => $this->getLastLogin() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s')))) : null,
-            'detectionTests' => $this->getDetectionTestsSerialized()
+            'detectionTests' => $this->getDetectionTestsSerialized(),
+            'totalInvoiced' => $this->calculateTotalInvoiced()
         );
     }
 
@@ -452,5 +453,23 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->lastLogin = $lastLogin;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function calculateTotalInvoiced(): int {
+        $detectionTests = $this->getDetectionTestsSerialized();
+        $invoiced = 0;
+
+        if (count($detectionTests) > 0) {
+            foreach($detectionTests as $detectionTest) {
+                if ($detectionTest['isInvoiced']) {
+                    $invoiced = $invoiced + 1;
+                }
+            }
+        }
+
+        return $invoiced;
     }
 }
