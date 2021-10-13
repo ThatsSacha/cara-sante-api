@@ -52,9 +52,27 @@ class PatientService extends AbstractRestService {
      */
     public function findByRef(string $ref): array
     {
-        return $this->repository->findBy(array(
+        $patient = $this->repository->findOneBy(array(
             'ref' => $ref
         ));
+        $patientToReturn = [];
+
+        if ($patient !== null) {
+            $patientToReturn = $patient->jsonSerialize();
+
+            foreach($patientToReturn['detectionTest'] as $i => $detectionTest) {
+                $detectionTestMonth = date_format($detectionTest['testedAt'], 'm');
+
+                // To not load antigenic test from September
+                if ($detectionTestMonth === '09') {
+                    unset($patientToReturn['detectionTest'][$i]);
+                }
+            }
+
+            $patientToReturn['detectionTest'] = array_values($patientToReturn['detectionTest']);
+        }
+
+        return $patientToReturn;
     }
 
     /**

@@ -133,7 +133,13 @@ class DetectionTestService extends AbstractRestService {
         $detectionTestsSerialized = [];
 
         foreach($detectionTests as $detectionTest) {
-            $detectionTestsSerialized[] = $detectionTest->jsonSerialize();
+            $detectionTestSerialized = $detectionTest->jsonSerialize();
+            $detectionTestMonth = date_format($detectionTestSerialized['testedAt'], 'm');
+
+            // To not load antigenic test from September
+            if ($detectionTestMonth !== '09') {
+                $detectionTestsSerialized[] = $detectionTestSerialized;
+            }
         }
 
         return $detectionTestsSerialized;

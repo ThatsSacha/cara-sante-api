@@ -61,12 +61,7 @@ class PatientController extends AbstractController
     public function show(string $ref): Response
     {
         $patients = $this->service->findByRef($ref);
-        $patient = [];
 
-        if (count($patients) > 0) {
-            $patient = $patients[0]->jsonSerialize();
-        }
-
-        return new Response(json_encode($patient, JSON_UNESCAPED_UNICODE));
+        return new Response(json_encode($patients, JSON_UNESCAPED_UNICODE), 200);
     }
 }
