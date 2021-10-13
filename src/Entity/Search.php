@@ -33,6 +33,17 @@ class Search
      */
     private $subject;
 
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array {
+        return array(
+            'id' => $this->getId(),
+            'searchedAtFrench' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getSearchedAt(), 'Y-m-d H:i:s')))),
+            'subject' => $this->getSubject()
+        );
+    }
+
     public function getId(): ?int
     {
         return $this->id;

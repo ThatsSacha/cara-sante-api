@@ -29,4 +29,24 @@ class SearchController extends AbstractController
 
         return new JsonResponse($ret, $ret['status']);
     }
+
+    #[Route('/history', name: 'search-history', methods: ['OPTIONS', 'GET'])]
+    public function history(): JsonResponse
+    {
+        $ret = $this->service->history($this->getUser());
+
+        return new JsonResponse($ret, 200);
+    }
+
+    #[Route('', name: 'search-delete', methods: ['OPTIONS', 'DELETE'])]
+    public function delete(Request $request): JsonResponse
+    {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
+        $this->service->deleteFromHistory($data);
+
+        return new JsonResponse([], 200);
+    }
 }

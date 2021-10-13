@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class SearchService extends AbstractRestService {
     private $patientRepository;
     private $serializer;
+    private $searchRepository;
 
     public function __construct(PatientRepository $patientRepository, SearchRepository $searchRepository, SerializerInterface $serializer, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, NormalizerInterface $normalizer)
     {
@@ -20,6 +21,7 @@ class SearchService extends AbstractRestService {
 
         $this->patientRepository = $patientRepository;
         $this->serializer = $serializer;
+        $this->searchRepository = $searchRepository;
     }
 
     /**
@@ -50,5 +52,47 @@ class SearchService extends AbstractRestService {
         }
 
         return $resp;
+    }
+
+    /**
+     * @param Users $user
+     * 
+     * @return array
+     */
+    public function history(Users $user): array {
+        $history = $this->searchRepository->findBy(
+            array(
+            'searchedBy' => $user
+            ),
+            array(
+                'searchedAt' => 'DESC'
+            ),
+            50
+        );
+
+        $historyReturn = array();
+
+        if (count($history) > 0) {
+            foreach($history as $el) {
+                $historyReturn[] = $el->jsonSerialize();
+            }
+        }
+
+        return $historyReturn;
+    }
+
+    /**
+     * @param array $data
+     * 
+     * @return void
+     */
+    public function deleteFromHistory(array $data): void {
+        $data = $data['elToDelete'];
+
+        if (count($data) > 0) {
+            foreach($data as $id) {
+                $this->delete($id);
+            }
+        }
     }
 }

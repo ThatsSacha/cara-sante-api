@@ -73,4 +73,10 @@ abstract class AbstractRestService {
     public function getByRef(string $ref) {
         return $this->repository->findOneBy(array('ref' => $ref));
     }
+
+    public function delete($id) {
+        $objectToRemove = $this->repository->findOneBy(array('id' => $id));
+        $this->emi->remove($objectToRemove);
+        $this->emi->flush();
+    }
 }
