@@ -16,7 +16,7 @@ class MailerService {
 
     public function sendMail(string $sendTo, string $subject, string $htmlTemplate, ?string $file = null, ?string $replyTo = null) {
         $mail = (new Email())
-        ->from(new Address('no-reply@liora.carasante.io', 'Liora | Cara Santé'))
+        ->from(new Address('no-reply@liora.app', 'Liora | Cara Santé'))
         ->to($sendTo)
         ->subject($subject)
         ->html($htmlTemplate);
