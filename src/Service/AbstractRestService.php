@@ -79,4 +79,8 @@ abstract class AbstractRestService {
         $this->emi->remove($objectToRemove);
         $this->emi->flush();
     }
+
+    public function findDataBy(array $data): mixed {
+        return $this->repository->findBy($data);
+    }
 }

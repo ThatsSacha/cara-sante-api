@@ -217,26 +217,23 @@ class DetectionTestService extends AbstractRestService {
             $data['updatingById'] = null;
         }
         
-        $detectionTest = $this->getByRef($data['ref']);
+        $detectionTests = $this->findDataBy(array('patient' => $data['patientId']));
 
-        if (!$detectionTest->getIsUpdating() || $detectionTest->getUpdatingBy()->getRef() === $user->getRef()) {
-            $detectionTest->setIsUpdating($data['isUpdating']);
-            $detectionTest->setUpdatingBy($user);
-            $detectionTest->setStartUpdating(date_create());
+        if (count($detectionTests) > 0) {
+            foreach($detectionTests as $detectionTest) {
+                $detectionTest->setIsUpdating($data['isUpdating']);
+                $detectionTest->setUpdatingBy($user);
+                $detectionTest->setStartUpdating(date_create());
+                $this->emi->persist($detectionTest);
+            }
 
-            $this->emi->persist($detectionTest);
             $this->emi->flush();
 
             return array(
                 'status' => 200,
                 $detectionTest->jsonSerialize()
-            );
+            );   
         }
-
-        return array(
-            'status' => 400,
-            'message' => 'Ce test est en cours saisit'
-        );
     }
 
     public function cronSetUpdating(): void {
