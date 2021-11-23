@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\DetectionTest;
 use App\Entity\Users;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;

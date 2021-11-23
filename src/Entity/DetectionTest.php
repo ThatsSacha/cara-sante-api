@@ -9,6 +9,7 @@ setlocale(LC_TIME, 'fr_FR');
 
 /**
  * @ORM\Entity(repositoryClass=DetectionTestRepository::class)
+ * @ORM\Table(indexes={@ORM\Index(columns={"ref"})})
  */
 class DetectionTest
 {
