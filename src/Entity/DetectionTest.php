@@ -71,6 +71,16 @@ class DetectionTest
      */
     private $startUpdating;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $doctorFirstName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $doctorLastName;
+
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
@@ -85,7 +95,9 @@ class DetectionTest
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
-            'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null
+            'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
+            'doctorFirstName' => $this->getDoctorFirstName(),
+            'doctorLastName' => $this->getDoctorLastName()
         );
     }
 
@@ -102,7 +114,9 @@ class DetectionTest
             'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
             'patient' => $this->getPatient()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
-            'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null
+            'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
+            'doctorFirstName' => $this->getDoctorFirstName(),
+            'doctorLastName' => $this->getDoctorLastName()
         );
     }
 
@@ -227,6 +241,30 @@ class DetectionTest
     public function setStartUpdating(?\DateTimeInterface $startUpdating): self
     {
         $this->startUpdating = $startUpdating;
+
+        return $this;
+    }
+
+    public function getDoctorFirstName(): ?string
+    {
+        return $this->doctorFirstName;
+    }
+
+    public function setDoctorFirstName(?string $doctorFirstName): self
+    {
+        $this->doctorFirstName = $doctorFirstName;
+
+        return $this;
+    }
+
+    public function getDoctorLastName(): ?string
+    {
+        return $this->doctorLastName;
+    }
+
+    public function setDoctorLastName(?string $doctorLastName): self
+    {
+        $this->doctorLastName = $doctorLastName;
 
         return $this;
     }

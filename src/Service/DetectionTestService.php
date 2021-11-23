@@ -190,7 +190,9 @@ class DetectionTestService extends AbstractRestService {
 
             if ($detectionTest !== null) {
                 $detectionTest->setIsNegative($detectionTestData['isNegative']);
-    
+                $detectionTest->setDoctorFirstName($detectionTestData['doctorFirstName']);
+                $detectionTest->setDoctorLastName($detectionTestData['doctorLastName']);
+
                 $this->emi->persist($detectionTest);
             }
         }

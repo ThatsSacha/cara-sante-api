@@ -40,7 +40,7 @@ class ParseCsvService {
                                 [new ObjectNormalizer()],
                                 [new CsvEncoder()]
                             );
-                
+
                 return array(
                     'lines' => $serializer->decode(
                         $file,
