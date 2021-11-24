@@ -86,14 +86,13 @@ class DetectionTest
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
-            'patient' => $this->getPatient()->jsonSerializeLight(),
+            'patient' => $this->getPatient() !== null ? $this->getPatient()->jsonSerializeLight() : null,
             'testedAt' => $this->getTestedAt(),
             'isNegative' => $this->getIsNegative(),
             'frenchTestedAt' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s')))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
             'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
-            'patient' => $this->getPatient()->jsonSerializeLight(),
             'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
@@ -106,19 +105,25 @@ class DetectionTest
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
-            'patient' => $this->getPatient()->jsonSerializeLight(),
+            'patient' => $this->getPatient() !== null ? $this->getPatient()->jsonSerializeLight() : null,
             'testedAt' => $this->getTestedAt(),
             'isNegative' => $this->getIsNegative(),
             'frenchTestedAt' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s')))),
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
             'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
-            'patient' => $this->getPatient()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
             'doctorFirstName' => $this->getDoctorFirstName(),
             'doctorLastName' => $this->getDoctorLastName()
         );
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getId(): ?int

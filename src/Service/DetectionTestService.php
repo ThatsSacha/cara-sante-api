@@ -131,14 +131,17 @@ class DetectionTestService extends AbstractRestService {
         $detectionTests = $this->repository->findBy(array(
             'isInvoiced' => false
         ), null, 20);
-        $detectionTestsSerialized = [];
 
+        $detectionTestsSerialized = [];
         foreach($detectionTests as $detectionTest) {
+            $doctorLastName = $detectionTest->getDoctorLastName();
             $detectionTestSerialized = $detectionTest->jsonSerialize();
             $detectionTestMonth = date_format($detectionTestSerialized['testedAt'], 'm');
 
-            // To not load antigenic test from September
-            if ($detectionTestMonth !== '09') {
+            // To not load antigenic test from September for M RABET doctor
+            if ($doctorLastName !== 'M RABET') {
+                $detectionTestsSerialized[] = $detectionTestSerialized;
+            } else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
                 $detectionTestsSerialized[] = $detectionTestSerialized;
             }
         }

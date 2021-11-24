@@ -62,9 +62,10 @@ class PatientService extends AbstractRestService {
 
             foreach($patientToReturn['detectionTest'] as $i => $detectionTest) {
                 $detectionTestMonth = date_format($detectionTest['testedAt'], 'm');
+                $doctorLastName = $detectionTest['doctorLastName'];
 
-                // To not load antigenic test from September
-                if ($detectionTestMonth === '09') {
+                // To not load antigenic test from September for M RABET doctor
+                if ($doctorLastName === 'M RABET' && $detectionTestMonth === '09') {
                     unset($patientToReturn['detectionTest'][$i]);
                 }
             }
