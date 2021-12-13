@@ -128,29 +128,29 @@ class DetectionTestService extends AbstractRestService {
      * @return array
      */
     public function findToTake(): array {
-        $$detectionTests = [];
+        $detectionTests = [];
         $limit = 20;
+        $detectionTestsSerialized = [];
 
         while (count($detectionTests) == 0) {
             $detectionTests = $this->repository->findBy(array(
                 'isInvoiced' => false
             ), null, $limit);
 
-            $limit = $limit + 20;
-        }
-
-        $detectionTestsSerialized = [];
-        foreach($detectionTests as $detectionTest) {
-            $doctorLastName = $detectionTest->getDoctorLastName();
-            $detectionTestSerialized = $detectionTest->jsonSerialize();
-            $detectionTestMonth = date_format($detectionTestSerialized['testedAt'], 'm');
-
-            // To not load antigenic test from September for M RABET doctor
-            if ($doctorLastName !== 'M RABET') {
-                $detectionTestsSerialized[] = $detectionTestSerialized;
-            } else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
-                $detectionTestsSerialized[] = $detectionTestSerialized;
+            foreach($detectionTests as $detectionTest) {
+                $doctorLastName = $detectionTest->getDoctorLastName();
+                $detectionTestSerialized = $detectionTest->jsonSerialize();
+                $detectionTestMonth = date_format($detectionTestSerialized['testedAt'], 'm');
+    
+                // To not load antigenic test from September for M RABET doctor
+                if ($doctorLastName !== 'M RABET') {
+                    $detectionTestsSerialized[] = $detectionTestSerialized;
+                } else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
+                    $detectionTestsSerialized[] = $detectionTestSerialized;
+                }
             }
+
+            $limit = $limit + 20;
         }
 
         return $detectionTestsSerialized;
