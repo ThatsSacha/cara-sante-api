@@ -132,7 +132,7 @@ class DetectionTestService extends AbstractRestService {
         $limit = 20;
         $detectionTestsSerialized = [];
 
-        while (count($detectionTests) == 0) {
+        while (count($detectionTestsSerialized) == 0) {
             $detectionTests = $this->repository->findBy(array(
                 'isInvoiced' => false
             ), null, $limit);
@@ -150,7 +150,7 @@ class DetectionTestService extends AbstractRestService {
                 }
             }
 
-            $limit = $limit + 20;
+            $limit = $limit + 40;
         }
 
         return $detectionTestsSerialized;
