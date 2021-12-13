@@ -171,6 +171,24 @@ class DetectionTestService extends AbstractRestService {
             $detectionTest->setUser($user);
 
             $this->emi->persist($detectionTest);
+
+            if ($data['validateAll']) {
+                $detectionTests = $this->findByPatientId($detectionTest->getPatient()->getId());
+                
+                foreach($detectionTests as $item) {
+                    $itemDate = date_format($item->getTestedAt(), 'Y-m-d');
+                    $detectionTestFillingDate = date_format($detectionTest->getTestedAt(), 'Y-m-d');
+
+                    if ($itemDate === $detectionTestFillingDate) {
+                        $item->setIsInvoiced($data['isInvoiced']);
+                        $item->setFilledAt($data['filledAt']);
+                        $item->setUser($user);
+
+                        $this->emi->persist($item);
+                    }
+                }
+            }
+
             $this->emi->flush();
 
             return array(
