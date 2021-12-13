@@ -128,9 +128,16 @@ class DetectionTestService extends AbstractRestService {
      * @return array
      */
     public function findToTake(): array {
-        $detectionTests = $this->repository->findBy(array(
-            'isInvoiced' => false
-        ), null, 20);
+        $$detectionTests = [];
+        $limit = 20;
+
+        while (count($detectionTests) == 0) {
+            $detectionTests = $this->repository->findBy(array(
+                'isInvoiced' => false
+            ), null, $limit);
+
+            $limit = $limit + 20;
+        }
 
         $detectionTestsSerialized = [];
         foreach($detectionTests as $detectionTest) {
