@@ -35,7 +35,14 @@ class PatientService extends AbstractRestService {
      * @return array
      */
     public function findAll(): array {
-        return $this->repository->findAll();
+        $patientsSerialized = [];
+        $patients =  $this->repository->findAll();
+
+        foreach($patients as $patient) {
+            $patientsSerialized[] = $patient->jsonSerialize();
+        }
+
+        return $patientsSerialized;
     }
 
     /**
