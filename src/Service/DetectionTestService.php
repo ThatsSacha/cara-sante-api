@@ -148,6 +148,8 @@ class DetectionTestService extends AbstractRestService {
                 } else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
                     $detectionTestsSerialized[] = $detectionTestSerialized;
                 }*/
+
+                $detectionTestsSerialized[] = $detectionTestSerialized;
             }
 
             $limit = $limit + 40;
