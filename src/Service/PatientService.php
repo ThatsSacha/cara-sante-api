@@ -35,14 +35,7 @@ class PatientService extends AbstractRestService {
      * @return array
      */
     public function findAll(): array {
-        $patientsSerialized = [];
-        $patients =  $this->repository->findAll();
-
-        foreach($patients as $patient) {
-            $patientsSerialized[] = $patient->jsonSerialize();
-        }
-
-        return $patientsSerialized;
+        return $this->repository->findAll();
     }
 
     /**
@@ -72,9 +65,9 @@ class PatientService extends AbstractRestService {
                 $doctorLastName = $detectionTest['doctorLastName'];
 
                 // To not load antigenic test from September for M RABET doctor
-                if ($doctorLastName === 'M RABET' && $detectionTestMonth === '09') {
+                /*if ($doctorLastName === 'M RABET' && $detectionTestMonth === '09') {
                     unset($patientToReturn['detectionTest'][$i]);
-                }
+                }*/
             }
 
             $patientToReturn['detectionTest'] = array_values($patientToReturn['detectionTest']);
