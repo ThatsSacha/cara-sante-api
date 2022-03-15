@@ -145,9 +145,9 @@ class DetectionTestService extends AbstractRestService {
                 // To not load antigenic test from September for M RABET doctor
                 if ($doctorLastName !== 'M RABET') {
                     $detectionTestsSerialized[] = $detectionTestSerialized;
-                } else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
+                } /*else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
                     $detectionTestsSerialized[] = $detectionTestSerialized;
-                }
+                }*/
             }
 
             $limit = $limit + 40;
