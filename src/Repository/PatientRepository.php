@@ -55,9 +55,9 @@ class PatientRepository extends ServiceEntityRepository
         $db = $this->getEntityManager()->getConnection();
         $query = 'SELECT * FROM patient';
         $d = $db->prepare($query);
-        $d->executeQuery();
+        $tmp = $d->executeQuery();
 
-        return $d->fetchAll();
+        return $tmp->fetchAll();
     }
 
     /**

@@ -45,7 +45,7 @@ class ParseCsvService {
                     'lines' => $serializer->decode(
                         $file,
                         'csv',
-                        [CsvEncoder::DELIMITER_KEY => ';']
+                        [CsvEncoder::DELIMITER_KEY => ',']
                     )
                 );
             } catch(Exception $e) {

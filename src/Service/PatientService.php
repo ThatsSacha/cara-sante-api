@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 date_default_timezone_set('Europe/Paris');
+ini_set('memory_limit', '-1');
 
 class PatientService extends AbstractRestService {
     private $repository;
@@ -124,7 +125,7 @@ class PatientService extends AbstractRestService {
                             'lastName' => $lastName,
                             'mail' => $mail,
                             'phone' => $phone,
-                            'birth' => $birth,
+                            'birth' => date_format(date_create($birth), 'Y-m-d'),
                             'street' => $mainAddress,
                             'zip' => $detectionTest['patient_main_address_zip'],
                             'city' => $detectionTest['patient_main_address_city'],
