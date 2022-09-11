@@ -56,9 +56,9 @@ class DetectionTestRepository extends ServiceEntityRepository
         $db = $this->getEntityManager()->getConnection();
         $query = 'SELECT * FROM detection_test';
         $d = $db->prepare($query);
-        $tmp = $d->execute();
+        $d->execute();
 
-        return $tmp->fetchAll();
+        return $d->fetchAll();
     }
 
     public function create(DetectionTest $detectionTest) {
