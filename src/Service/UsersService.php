@@ -13,8 +13,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 use function Sodium\randombytes_uniform;
 
-date_default_timezone_set('Europe/Paris');
-
 class UsersService extends AbstractRestService {
     private $passwordHasher;
     private $repository;

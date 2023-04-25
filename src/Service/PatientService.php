@@ -17,7 +17,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
-date_default_timezone_set('Europe/Paris');
 ini_set('memory_limit', '-1');
 
 class PatientService extends AbstractRestService {

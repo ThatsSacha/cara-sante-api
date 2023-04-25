@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\UsersRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use IntlDateFormatter;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UsersRepository::class)
@@ -115,6 +116,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function jsonSerialize(): array {
+        $lastLoginFrench = IntlDateFormatter::formatObject( 
+            $this->getLastLogin(), 
+            IntlDateFormatter::RELATIVE_MEDIUM, 
+            'fr' 
+          );
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
@@ -130,7 +136,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'isDesactivated' => $this->getIsDesactivated(),
             'desactivatedAt' => $this->getDesactivatedAt(),
             'desactivatedBy' => $this->getDesactivatedBy() === null ? null : $this->getDesactivatedBy()->jsonSerializeLight(),
-            'lastLoginFrench' => $this->getLastLogin() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s')))) : null,
+            'lastLoginFrench' => $this->getLastLogin() !== null ? $lastLoginFrench : null,
             'detectionTests' => $this->getDetectionTestsSerialized(),
             'totalInvoiced' => $this->calculateTotalInvoiced()
         );

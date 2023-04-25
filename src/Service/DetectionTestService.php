@@ -11,8 +11,6 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-date_default_timezone_set('Europe/Paris');
-
 class DetectionTestService extends AbstractRestService {
     private $repository;
     private $emi;
