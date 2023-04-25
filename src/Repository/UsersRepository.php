@@ -75,7 +75,7 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
         $response = $query->executeQuery();
         $detectionTestCount = $response->fetchAll()[0];
         
-        $query = 'SELECT first_name AS firstName, last_name as lastName, email AS mail, phone, last_login AS lastLogin, is_first_connection AS isFirstConnection, is_desactivated AS isDesactivated FROM users WHERE id != :val';
+        $query = 'SELECT first_name AS firstName, last_name as lastName, email AS mail, phone, last_login AS lastLogin, is_first_connection AS isFirstConnection, is_desactivated AS isDesactivated, ref FROM users WHERE id != :val';
         $query = $db->prepare($query);
         $query->bindValue('val', $userId);
         $response = $query->executeQuery();
