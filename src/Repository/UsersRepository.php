@@ -64,4 +64,24 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
         ;
     }
     */
+
+    public function findAllWithDetectionTestCount($user) {
+        $userId = $user->getId();
+        $db = $this->getEntityManager()->getConnection();
+
+        $query = "SELECT COUNT(*) AS detection_test_count FROM detection_test WHERE user_id != :val GROUP BY user_id";
+        $query = $db->prepare($query);
+        $query->bindValue('val', $userId);
+        $response = $query->executeQuery();
+        $detectionTestCount = $response->fetchAll()[0];
+        
+        $query = 'SELECT first_name AS firstName, last_name as lastName, email AS mail, phone, last_login AS lastLogin, is_first_connection AS isFirstConnection, is_desactivated AS isDesactivated FROM users WHERE id != :val';
+        $query = $db->prepare($query);
+        $query->bindValue('val', $userId);
+        $response = $query->executeQuery();
+        $user = $response->fetchAll();
+        $user[0]['totalInvoiced'] = $detectionTestCount['detection_test_count'];
+        $user[0]['lastLoginFrench'] = $user[0]['lastLogin'] ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format(date_create($user[0]['lastLogin']), 'Y-m-d H:i:s')))) : null;
+        return $user;
+    }
 }

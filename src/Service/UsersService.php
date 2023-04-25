@@ -252,7 +252,8 @@ class UsersService extends AbstractRestService {
      * @return array
      */
     public function findAllExceptCurrent(Users $currentUser): array {
-        $users = $this->repository->findAll();
+        return $this->repository->findAllWithDetectionTestCount($currentUser);
+        /*dd($users);
         $usersSerialized = [];
 
         foreach($users as $user) {
@@ -261,7 +262,7 @@ class UsersService extends AbstractRestService {
             }
         }
 
-        return $usersSerialized;
+        return $usersSerialized;*/
     }
 
     /**
