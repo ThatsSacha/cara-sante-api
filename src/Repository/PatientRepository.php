@@ -81,11 +81,11 @@ class PatientRepository extends ServiceEntityRepository
         ';
 
         $d = $db->prepare($query);
-        $d->executeQuery(array(
+        $search = $d->executeQuery(array(
                 ':value' => '%' . $value . '%'
             )
         );
 
-        return $d->fetchAll();
+        return $search->fetchAll();
     }
 }
