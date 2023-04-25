@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\SearchRepository;
+use IntlDateFormatter;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\SearchRepository;
 
 /**
  * @ORM\Entity(repositoryClass=SearchRepository::class)
@@ -39,7 +40,7 @@ class Search
     public function jsonSerialize(): array {
         return array(
             'id' => $this->getId(),
-            'searchedAtFrench' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getSearchedAt(), 'Y-m-d H:i:s')))),
+            'searchedAtFrench' => IntlDateFormatter::formatObject($this->getSearchedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr'),
             'subject' => $this->getSubject()
         );
     }

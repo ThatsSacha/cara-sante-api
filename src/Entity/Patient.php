@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\PatientRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use IntlDateFormatter;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PatientRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass=PatientRepository::class)
@@ -87,7 +88,7 @@ class Patient
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
             'phone' => $this->getPhone(),
-            'birth' => date_format($this->getBirth(), 'd/m/Y'),
+            'birth' => IntlDateFormatter::formatObject($this->getBirth(), 'dd/MM/yyyy', 'fr'),
             'street' => $this->getStreet(),
             'zip' => $this->getZip(),
             'city' => $this->getCity(),
@@ -104,7 +105,7 @@ class Patient
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
             'phone' => $this->getPhone(),
-            'birth' => date_format($this->getBirth(), 'd/m/Y'),
+            'birth' => IntlDateFormatter::formatObject($this->getBirth(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr'),
             'street' => $this->getStreet(),
             'zip' => $this->getZip(),
             'city' => $this->getCity(),

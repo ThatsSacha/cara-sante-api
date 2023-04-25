@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\DetectionTestRepository;
 use DateTime;
+use IntlDateFormatter;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\DetectionTestRepository;
 setlocale(LC_TIME, 'fr_FR');
 
 /**
@@ -83,16 +84,19 @@ class DetectionTest
     private $doctorLastName;
 
     public function jsonSerialize(): array {
+        $frenchTestedAt = IntlDateFormatter::formatObject($this->getTestedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+        $filledAtFrench = $this->getFilledAt() === null ? : IntlDateFormatter::formatObject($this->getFilledAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
             'patient' => $this->getPatient() !== null ? $this->getPatient()->jsonSerializeLight() : null,
             'testedAt' => $this->getTestedAt(),
             'isNegative' => $this->getIsNegative(),
-            'frenchTestedAt' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s')))),
+            'frenchTestedAt' => $frenchTestedAt,
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
-            'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
+            'filledAtFrench' => $this->getFilledAt() !== null ? $filledAtFrench : null,
             'user' => $this->getUser() === null ? null : $this->getUser()->jsonSerializeLight(),
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
@@ -102,16 +106,19 @@ class DetectionTest
     }
 
     public function jsonSerializeLight(): array {
+        $frenchTestedAt = IntlDateFormatter::formatObject($this->getTestedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+        $filledAtFrench = $this->getFilledAt() === null ? : IntlDateFormatter::formatObject($this->getFilledAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
             'patient' => $this->getPatient() !== null ? $this->getPatient()->jsonSerializeLight() : null,
             'testedAt' => $this->getTestedAt(),
             'isNegative' => $this->getIsNegative(),
-            'frenchTestedAt' => utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getTestedAt(), 'Y-m-d H:i:s')))),
+            'frenchTestedAt' => $frenchTestedAt,
             'isInvoiced' => $this->getIsInvoiced(),
             'filledAt' => $this->getFilledAt(),
-            'filledAtFrench' => $this->getFilledAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getFilledAt(), 'Y-m-d H:i:s')))) : null,
+            'filledAtFrench' => $this->getFilledAt() !== null ? $filledAtFrench : null,
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
             'doctorFirstName' => $this->getDoctorFirstName(),

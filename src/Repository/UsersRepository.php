@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Users;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use IntlDateFormatter;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @method Users|null find($id, $lockMode = null, $lockVersion = null)
@@ -81,7 +82,8 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
         $response = $query->executeQuery();
         $user = $response->fetchAll();
         $user[0]['totalInvoiced'] = $detectionTestCount['detection_test_count'];
-        $user[0]['lastLoginFrench'] = $user[0]['lastLogin'] ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format(date_create($user[0]['lastLogin']), 'Y-m-d H:i:s')))) : null;
+        $user[0]['lastLoginFrench'] = $user[0]['lastLogin'] === null ? : IntlDateFormatter::formatObject($user[0]['lastLogin'], IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+
         return $user;
     }
 }

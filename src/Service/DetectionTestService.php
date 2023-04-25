@@ -2,9 +2,10 @@
 
 namespace App\Service;
 
-use App\Entity\DetectionTest;
-use App\Entity\Users;
 use Exception;
+use App\Entity\Users;
+use IntlDateFormatter;
+use App\Entity\DetectionTest;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DetectionTestRepository;
 use Symfony\Component\Security\Core\User\User;
@@ -338,20 +339,9 @@ class DetectionTestService extends AbstractRestService {
                     $detectionTest = $detectionTest->jsonSerialize();
                 }
                 
-                $filledAt = date_format($detectionTest['filledAt'], 'd-m-Y');
+                $filledAt = IntlDateFormatter::formatObject($detectionTest['filledAt'], IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
                 $detectionTest['filledAt'] = $filledAt;
-                $today = date_format(date_create(), 'd-m-Y');
-                $dateText = '';
-    
-                if ($filledAt === $today) {
-                    $dateText = 'Aujourd\'hui';
-                } else if ($filledAt === date_format(date_modify(date_create(), '- 1 day'), 'd-m-Y')) {
-                    $dateText = 'Hier';
-                } else {
-                    $dateText = 'Le ' . date_format(date_create($detectionTest['filledAt']), 'd/m');
-                }
                 
-                $detectionTestsByDate[$detectionTest['filledAt']]['dateText'] = $dateText;
                 $detectionTestsByDate[$detectionTest['filledAt']]['object'][] = $detectionTest;
             }
         }

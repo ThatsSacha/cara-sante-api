@@ -116,11 +116,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function jsonSerialize(): array {
-        $lastLoginFrench = IntlDateFormatter::formatObject( 
-            $this->getLastLogin(), 
-            IntlDateFormatter::RELATIVE_MEDIUM, 
-            'fr' 
-          );
+        $lastLoginFrench = IntlDateFormatter::formatObject($this->getLastLogin(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
@@ -130,7 +127,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'phone' => $this->getPhone(),
             'roles' => $this->getRoles(),
             'createdAt' => date_format($this->getCreatedAt(), 'd/m/Y H:s'),
-            'createdAtFrench' => $this->getCreatedAt() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getCreatedAt(), 'Y-m-d H:i:s')))) : null,
+            'createdAtFrench' => $this->getCreatedAt() !== null ? IntlDateFormatter::formatObject($this->getCreatedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr') : null,
             'createdBy' => $this->getCreatedBy() !== null ? $this->getCreatedBy()->jsonSerializeLight() : null,
             'isFirstConnection' => $this->getIsFirstConnection(),
             'isDesactivated' => $this->getIsDesactivated(),
@@ -143,6 +140,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function jsonSerializeLight(): array {
+        $lastLoginFrench = IntlDateFormatter::formatObject($this->getLastLogin(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
@@ -153,7 +152,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'isFirstConnection' => $this->getIsFirstConnection(),
             'isDesactivated' => $this->getIsDesactivated(),
             'desactivatedAt' => $this->getDesactivatedAt(),
-            'lastLoginFrench' => $this->getLastLogin() !== null ? utf8_encode(strftime('%A %d %B %G - %H:%M', strtotime(date_format($this->getLastLogin(), 'Y-m-d H:i:s')))) : null
+            'lastLoginFrench' => $this->getLastLogin() !== null ? $lastLoginFrench : null
         );
     }
 
