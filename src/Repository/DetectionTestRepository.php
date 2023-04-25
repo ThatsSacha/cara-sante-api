@@ -73,7 +73,7 @@ class DetectionTestRepository extends ServiceEntityRepository
     }
 
     public function getStatsByUser(Users $user) {
-        $db = $this->getEntityManager()->getConnection();
+        /*$db = $this->getEntityManager()->getConnection();
 
         $query = 'SELECT * FROM detection_test
         WHERE is_invoiced = true
@@ -83,11 +83,17 @@ class DetectionTestRepository extends ServiceEntityRepository
         $query = $db->prepare($query);
         $query->executeQuery();
 
-        return $query->fetchAll();
+        return $query->fetchAll();*/
+        return $this->findBy(array(
+            'isInvoiced' => true,
+            'user' => $user
+        ), array(
+            'filledAt' => 'DESC'
+        ));
     }
 
     public function getStats() {
-        $db = $this->getEntityManager()->getConnection();
+        /*$db = $this->getEntityManager()->getConnection();
 
         $query = 'SELECT * FROM detection_test
         WHERE is_invoiced = true
@@ -96,7 +102,12 @@ class DetectionTestRepository extends ServiceEntityRepository
         $query = $db->prepare($query);
         $query->executeQuery();
 
-        return $query->fetchAll();
+        return $query->fetchAll();*/
+        return $this->findBy(array(
+            'isInvoiced' => true
+        ), array(
+            'filledAt' => 'DESC'
+        ));
     }
 
     public function getRemaining() {
@@ -106,9 +117,8 @@ class DetectionTestRepository extends ServiceEntityRepository
         WHERE filled_at IS NULL';
 
         $query = $db->prepare($query);
-        $query->executeQuery();
-
-        return $query->fetchAll();
+        $response = $query->executeQuery();
+        return $response->fetchAllAssociative();
     }
 
     public function findRandomTests() {

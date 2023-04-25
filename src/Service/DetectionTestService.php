@@ -319,27 +319,32 @@ class DetectionTestService extends AbstractRestService {
         if ($type === 'user') {
             $detectionTests = $this->repository->getStatsByUser($user);
         } else if ($type === 'team') {
-            $detectionTests = $this->repository->getStats($user);
+            $detectionTests = $this->repository->getStats();
         }
 
         $detectionTestsByDate = [];
 
         if (count($detectionTests) > 0) {
             foreach($detectionTests as $detectionTest) {
-                $detectionTest['filled_at'] = date_format(date_create($detectionTest['filled_at']), 'd-m-Y');
+                if ($detectionTest instanceof DetectionTest) {
+                    $detectionTest = $detectionTest->jsonSerialize();
+                }
+                
+                $filledAt = date_format($detectionTest['filledAt'], 'd-m-Y');
+                $detectionTest['filledAt'] = $filledAt;
                 $today = date_format(date_create(), 'd-m-Y');
                 $dateText = '';
     
-                if ($detectionTest['filled_at'] === $today) {
+                if ($filledAt === $today) {
                     $dateText = 'Aujourd\'hui';
-                } else if ($detectionTest['filled_at'] === date_format(date_modify(date_create(), '- 1 day'), 'd-m-Y')) {
+                } else if ($filledAt === date_format(date_modify(date_create(), '- 1 day'), 'd-m-Y')) {
                     $dateText = 'Hier';
                 } else {
-                    $dateText = 'Le ' . date_format(date_create($detectionTest['filled_at']), 'd/m');
+                    $dateText = 'Le ' . date_format(date_create($detectionTest['filledAt']), 'd/m');
                 }
-    
-                $detectionTestsByDate[$detectionTest['filled_at']]['dateText'] = $dateText;
-                $detectionTestsByDate[$detectionTest['filled_at']]['object'][] = $detectionTest;
+                
+                $detectionTestsByDate[$detectionTest['filledAt']]['dateText'] = $dateText;
+                $detectionTestsByDate[$detectionTest['filledAt']]['object'][] = $detectionTest;
             }
         }
 
@@ -353,10 +358,10 @@ class DetectionTestService extends AbstractRestService {
         $response = [];
         $response['count'] = $count;
 
-        if ($count >= 15000) { $message = 'Avec de la force vous y arriverez !'; }
-        else if ($count >= 10000) { $message = 'Restez motivé(e)s !'; }
-        else if ($count >= 7000) { $message = 'Vous avancez drôlement bien en équipe !'; }
-        else if ($count >= 4000) { $message = 'Allez, on garde ce rythme, c\'est super !'; }
+        if ($count >= 3500) { $message = 'Avec de la force vous y arriverez !'; }
+        else if ($count >= 3000) { $message = 'Restez motivé(e)s !'; }
+        else if ($count >= 2500) { $message = 'Vous avancez drôlement bien en équipe !'; }
+        else if ($count >= 2000) { $message = 'Allez, on garde ce rythme, c\'est super !'; }
         else if ($count <= 1000) { $message = 'Woaw... Les derniers 1000 tests !!'; }
         else if ($count >= 500) { $message = 'On se rapproche drôlement de la fin...'; }
         else if ($count >= 300) { $message = 'Aller la team vous avez bientôt fini !'; }
@@ -365,7 +370,7 @@ class DetectionTestService extends AbstractRestService {
         else if ($count <= 10) { $message = 'À ce niveau c\'est du gâteau...'; }
         else if ($count <= 5) { $message = 'Je ne vais pas faire le décompte hein... :p'; }
         else if ($count <= 1) { $message = 'Qui saisira le dernier test...?'; }
-        else if ($count === 0) { $message = 'Bravo, vous pouvez être fière de vous !'; }
+        else if ($count === 0) { $message = 'Bravo, vous pouvez être fière de vous ! Aucun test restant !'; }
 
         $response['message'] = $message;
         $response['countText'] = number_format($count, 0, ' ', ' ');
