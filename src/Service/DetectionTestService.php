@@ -135,7 +135,17 @@ class DetectionTestService extends AbstractRestService {
         $limit = 20;
         $detectionTestsSerialized = [];
 
-        while (count($detectionTestsSerialized) == 0) {
+        $detectionTests = $this->repository->findBy(array(
+            'isInvoiced' => false
+        ), null, $limit);
+
+        foreach($detectionTests as $detectionTest) {
+            $detectionTestSerialized[] = $detectionTest->jsonSerialize();
+        }
+
+        return $detectionTestSerialized;
+        
+        /*while (count($detectionTestsSerialized) == 0) {
             $detectionTests = $this->repository->findBy(array(
                 'isInvoiced' => false
             ), null, $limit);
@@ -150,15 +160,15 @@ class DetectionTestService extends AbstractRestService {
                     $detectionTestsSerialized[] = $detectionTestSerialized;
                 } else if ($doctorLastName === 'M RABET' && $detectionTestMonth !== '09') {
                     $detectionTestsSerialized[] = $detectionTestSerialized;
-                }*/
+                }
 
                 $detectionTestsSerialized[] = $detectionTestSerialized;
             }
 
             $limit = $limit + 40;
-        }
+        }*/
 
-        return $detectionTestsSerialized;
+        //return $detectionTestsSerialized;
     }
 
     /**
