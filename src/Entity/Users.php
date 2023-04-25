@@ -116,7 +116,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function jsonSerialize(): array {
-        $lastLoginFrench = IntlDateFormatter::formatObject($this->getLastLogin(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+        $lastLoginFrench = $this->getLastLogin() === null ? : IntlDateFormatter::formatObject($this->getLastLogin(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
 
         return array(
             'id' => $this->getId(),
@@ -140,7 +140,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function jsonSerializeLight(): array {
-        $lastLoginFrench = IntlDateFormatter::formatObject($this->getLastLogin(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+        $lastLoginFrench = $this->getLastLogin() === null ? : IntlDateFormatter::formatObject($this->getLastLogin(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
 
         return array(
             'id' => $this->getId(),
