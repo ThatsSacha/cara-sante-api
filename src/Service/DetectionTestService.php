@@ -63,7 +63,7 @@ class DetectionTestService extends AbstractRestService {
         $detectionTestsInDb = [];
 
         foreach($detectionTests as $detectionTest) {
-            $detectionTestsInDb[$detectionTest['ref']] = $detectionTest;
+            $detectionTestsInDb[$detectionTest->getRef()] = $detectionTest;
         }
 
         return array($detectionTests, $detectionTestsInDb);
@@ -81,7 +81,10 @@ class DetectionTestService extends AbstractRestService {
         }
 
         foreach($csvDetectionTests as $i => $csvDetectionTest) {
-            $csvDetectionTests[$i]['patient'] = (int) $createdPatients[$csvDetectionTest['nir']]['id'];
+            //$csvDetectionTests[$i]['patient'] = (int) $createdPatients[$csvDetectionTest['nir']]['id'];
+            
+            $patientId = $createdPatients[$csvDetectionTest['nir']]->getId();
+            $csvDetectionTests[$i]['patient'] = $patientId;
         }
 
         $this->createDetectionTest($csvDetectionTests);

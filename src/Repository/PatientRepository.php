@@ -15,11 +15,9 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PatientRepository extends ServiceEntityRepository
 {
-    private $emi;
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $emi)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Patient::class);
-        $this->emi = $emi;
     }
 
     // /**
@@ -51,14 +49,14 @@ class PatientRepository extends ServiceEntityRepository
     }
     */
 
-    public function findAll() {
+    /*public function findAll() {
         $db = $this->getEntityManager()->getConnection();
         $query = 'SELECT * FROM patient';
         $d = $db->prepare($query);
         $d->executeQuery();
 
         return $d->fetchAll();
-    }
+    }*/
 
     /**
      * @param string $value

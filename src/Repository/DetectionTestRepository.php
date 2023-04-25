@@ -52,14 +52,14 @@ class DetectionTestRepository extends ServiceEntityRepository
     }
     */
 
-    public function findAll() {
+    /*public function findAll() {
         $db = $this->getEntityManager()->getConnection();
         $query = 'SELECT * FROM detection_test';
         $d = $db->prepare($query);
         $d->execute();
 
         return $d->fetchAll();
-    }
+    }*/
 
     public function create(DetectionTest $detectionTest) {
         $db = $this->getEntityManager()->getConnection();

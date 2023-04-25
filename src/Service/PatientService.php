@@ -9,7 +9,9 @@ use App\Service\UploadFileService;
 use App\Service\AbstractRestService;
 use App\Repository\PatientRepository;
 use App\Service\DetectionTestService;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -19,20 +21,17 @@ date_default_timezone_set('Europe/Paris');
 ini_set('memory_limit', '-1');
 
 class PatientService extends AbstractRestService {
-    private $repository;
-    private $parseCsvService;
-    private $uploadFileService;
-    private $detectionTestService;
-    private $params;
-
-    public function __construct(PatientRepository $repository, EntityManagerInterface $emi, DenormalizerInterface $denormalizer, ParseCsvService $parseCsvService, UploadFileService $uploadFileService, DetectionTestService $detectionTestService, NormalizerInterface $normalizer, ContainerBagInterface $params) {
+    public function __construct(
+        private string $params,
+        private PatientRepository $repository,
+        private EntityManagerInterface $emi,
+        private DenormalizerInterface $denormalizer,
+        private ParseCsvService $parseCsvService,
+        private UploadFileService $uploadFileService,
+        private DetectionTestService $detectionTestService,
+        private NormalizerInterface $normalizer
+    ) {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
-
-        $this->repository = $repository;
-        $this->parseCsvService = $parseCsvService;
-        $this->uploadFileService = $uploadFileService;
-        $this->detectionTestService = $detectionTestService;
-        $this->params = $params;
     }
 
     /**
@@ -100,7 +99,7 @@ class PatientService extends AbstractRestService {
                 file_put_contents('./uploads/detection-test.log', '');
 
                 foreach($detectionTests as $i => $detectionTest) {
-                    $medicalCenter = $this->params->get('MEDICAL_CENTER');
+                    $medicalCenter = $this->params;
                     
                     if ($detectionTest['medical_center'] !== $medicalCenter) {
                         continue;
@@ -119,40 +118,52 @@ class PatientService extends AbstractRestService {
                     $doctorFirstName = $detectionTest['professional_first_name'];
                     $doctorLastName = $detectionTest['professional_last_name'];*/
 
-                    $ref = uniqid('new-');
+                     
                     $firstName = $detectionTest['invoiced_by_first_name'];
                     $lastName = $detectionTest['invoiced_by_last_name'];
-                    $dateTime = $detectionTest['antigenic_date'];
-                    $doctorFirstName = $detectionTest['doctor_first_name'];
-                    $doctorLastName = $detectionTest['doctor_last_name'];
-                    $birth = $detectionTest['birth'];
+                    $dateTime = date_create($detectionTest['antigenic_date']);
+                    $doctorFirstName = $detectionTest['doctor_first_name'] === 'NULL' ? null : $detectionTest['doctor_first_name'];
+                    $doctorLastName = $detectionTest['doctor_last_name'] === 'NULL' ? null : $detectionTest['doctor_last_name'];
+                    $birth = $detectionTest['birth'] === 'NULL' ? null : date_create($detectionTest['birth']);
                     $nir = $detectionTest['nir'];
-
-                    if (!empty($detectionTest['patient_first_name']) && !empty($detectionTest['patient_usual_name']) && !empty($detectionTest['patient_email']) && !empty($nir)) {
+                    $isNegative = (bool) $detectionTest['is_negative'];
+                    $mail = $detectionTest['Mail'];
+                    $phone = $detectionTest['phone'];
+                    $street = $detectionTest['street'];
+                    $zip = $detectionTest['zip'];
+                    $city = $detectionTest['city'];
+                    $ref = $detectionTest['ref'];
+                    
+                    if (!empty($firstName) && !empty($lastName) && !empty($nir) && $birth !== false && $dateTime !== false) {
                         $csvDetectionTest[$ref] = [
                             'ref' => $ref,
                             'nir' => $nir,
-                            'testedAt' => $dateTime,
-                            //'isNegative' => $isNegative,
+                            'testedAt' => $dateTime->format('Y-m-d'),
+                            'isNegative' => $isNegative,
                             'doctorFirstName' => $doctorFirstName,
                             'doctorLastName' => $doctorLastName
                         ];
-
-                        $csvNir[$detectionTest['patient_nir']] = [
+                        
+                        $csvNir[$nir] = [
                             'firstName' => $firstName,
                             'lastName' => $lastName,
-                            //'mail' => $mail,
-                            //'phone' => $phone,
-                            'birth' => date_format(date_create($birth), 'Y-m-d'),
-                            //'street' => $mainAddress,
-                            //'zip' => $detectionTest['patient_main_address_zip'],
-                            //'city' => $detectionTest['patient_main_address_city'],
+                            'mail' => $mail,
+                            'phone' => $phone,
+                            'birth' => $birth === null ? null : $birth->format('Y-m-d'),
+                            'street' => $street,
+                            'zip' => $zip,
+                            'city' => $city,
                             'nir' => $nir,
-                            'testedAt' => $dateTime,
+                            'testedAt' => $dateTime->format('Y-m-d'),
                             'ref' => hash('crc32', time()) . '-' . uniqid() . '-' . uniqid()
                         ];
                     } else {
-                        $write = "\nNIR empty : $firstName $lastName";
+                        if (empty($firstName) || empty($lastName)) { $message = "Unknown name"; }
+                        else if (empty($nir)) { $message = "Empty NIR"; }
+                        else if ($birth === false) { $message = "Birth is false"; }
+                        else if ($dateTime === false) { $message = "DateTime is false " . $detectionTest['antigenic_date'];}
+                        else { $message = "Unknown error"; }
+                        $write = "\n$message : $firstName $lastName";
                         file_put_contents('./uploads/detection-test.log', $write, FILE_APPEND);
                     }
                 }
@@ -163,7 +174,9 @@ class PatientService extends AbstractRestService {
                         $this->detectionTestService->updateDetectionTestFromImport($csvDetectionTest);
                     }
                 } else if ($import) {
+                    //dd($csvDetectionTest);
                     $createdPatients = $this->createPatients($csvNir);
+                    //dd($createdPatients, $csvNir);
                     $this->detectionTestService->createDetectionTests($csvDetectionTest, $createdPatients[1]);
                 }
             } else {
@@ -186,7 +199,7 @@ class PatientService extends AbstractRestService {
         $patientsInDb = [];
 
         foreach($patients as $patient) {
-            $patientsInDb[$patient['nir']] = $patient;
+            $patientsInDb[$patient->getNir()] = $patient;
         }
 
         return array($patients, $patientsInDb);

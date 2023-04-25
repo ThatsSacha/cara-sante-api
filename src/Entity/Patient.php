@@ -40,7 +40,7 @@ class Patient
     private $phone;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     private $birth;
 
@@ -165,12 +165,12 @@ class Patient
         return $this;
     }
 
-    public function getBirth(): ?\DateTime
+    public function getBirth(): \DateTime|null
     {
         return $this->birth;
     }
 
-    public function setBirth(\DateTime $birth): self
+    public function setBirth(\DateTime|null $birth): self
     {
         $this->birth = $birth;
 

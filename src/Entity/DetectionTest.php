@@ -251,24 +251,24 @@ class DetectionTest
         return $this;
     }
 
-    public function getDoctorFirstName(): ?string
+    public function getDoctorFirstName(): string|null
     {
         return $this->doctorFirstName;
     }
 
-    public function setDoctorFirstName(?string $doctorFirstName): self
+    public function setDoctorFirstName(string|null $doctorFirstName): self
     {
         $this->doctorFirstName = $doctorFirstName;
 
         return $this;
     }
 
-    public function getDoctorLastName(): ?string
+    public function getDoctorLastName(): string|null
     {
         return $this->doctorLastName;
     }
 
-    public function setDoctorLastName(?string $doctorLastName): self
+    public function setDoctorLastName(string|null $doctorLastName): self
     {
         $this->doctorLastName = $doctorLastName;
 
