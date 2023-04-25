@@ -82,7 +82,7 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
         $response = $query->executeQuery();
         $user = $response->fetchAll();
         $user[0]['totalInvoiced'] = $detectionTestCount['detection_test_count'];
-        $user[0]['lastLoginFrench'] = $user[0]['lastLogin'] === null ? : IntlDateFormatter::formatObject($user[0]['lastLogin'], IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+        $user[0]['lastLoginFrench'] = $user[0]['lastLogin'] === null ? : IntlDateFormatter::formatObject(date_create($user[0]['lastLogin']), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
 
         return $user;
     }
