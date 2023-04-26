@@ -83,6 +83,16 @@ class DetectionTest
      */
     private $doctorLastName;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isInvoicedOnAmelipro;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Users::class)
+     */
+    private $alreadyInvoicedBy;
+
     public function jsonSerialize(): array {
         $frenchTestedAt = IntlDateFormatter::formatObject($this->getTestedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
         $filledAtFrench = $this->getFilledAt() === null ? : IntlDateFormatter::formatObject($this->getFilledAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
@@ -101,7 +111,9 @@ class DetectionTest
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
             'doctorFirstName' => $this->getDoctorFirstName(),
-            'doctorLastName' => $this->getDoctorLastName()
+            'doctorLastName' => $this->getDoctorLastName(),
+            'isInvoicedOnAmelipro' => $this->getIsInvoicedOnAmelipro(),
+            'alreadyInvoicedBy' => $this->getAlreadyInvoicedBy()?->jsonSerializeLight()
         );
     }
 
@@ -122,7 +134,9 @@ class DetectionTest
             'isUpdating' => $this->getIsUpdating(),
             'updatingBy' => $this->getUpdatingBy() !== null ? $this->getUpdatingBy()->jsonSerializeLight() : null,
             'doctorFirstName' => $this->getDoctorFirstName(),
-            'doctorLastName' => $this->getDoctorLastName()
+            'doctorLastName' => $this->getDoctorLastName(),
+            'isInvoicedOnAmelipro' => $this->getIsInvoicedOnAmelipro(),
+            'alreadyInvoicedBy' => $this->getAlreadyInvoicedBy()?->jsonSerializeLight()
         );
     }
 
@@ -278,6 +292,30 @@ class DetectionTest
     public function setDoctorLastName(string|null $doctorLastName): self
     {
         $this->doctorLastName = $doctorLastName;
+
+        return $this;
+    }
+
+    public function getIsInvoicedOnAmelipro(): ?bool
+    {
+        return $this->isInvoicedOnAmelipro;
+    }
+
+    public function setIsInvoicedOnAmelipro(bool $isInvoicedOnAmelipro): self
+    {
+        $this->isInvoicedOnAmelipro = $isInvoicedOnAmelipro;
+
+        return $this;
+    }
+
+    public function getAlreadyInvoicedBy(): ?Users
+    {
+        return $this->alreadyInvoicedBy;
+    }
+
+    public function setAlreadyInvoicedBy(?Users $alreadyInvoicedBy): self
+    {
+        $this->alreadyInvoicedBy = $alreadyInvoicedBy;
 
         return $this;
     }

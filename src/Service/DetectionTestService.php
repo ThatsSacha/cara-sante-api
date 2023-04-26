@@ -189,6 +189,7 @@ class DetectionTestService extends AbstractRestService {
         if (!$detectionTest->getIsInvoiced()) {
             $detectionTest->setIsInvoiced($data['isInvoiced']);
             $detectionTest->setFilledAt($data['filledAt']);
+            $detectionTest->setIsInvoicedOnAmelipro($data['isInvoicedOnAmelipro']);
             $detectionTest->setUser($user);
 
             $this->emi->persist($detectionTest);
