@@ -76,6 +76,7 @@ class UsersController extends AbstractController
     }
 
     #[Route('/all', name: 'users_all', methods: ['OPTIONS', 'GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function all(): JsonResponse
     {
         $users = $this->usersService->findAllExceptCurrent($this->getUser());
@@ -83,7 +84,16 @@ class UsersController extends AbstractController
         return new JsonResponse($users, 200);
     }
 
+    #[Route('/all/light', name: 'users_all_light', methods: ['OPTIONS', 'GET'])]
+    public function allLight(): JsonResponse
+    {
+        $users = $this->usersService->findAllLight($this->getUser());
+
+        return new JsonResponse($users, 200);
+    }
+
     #[Route('/desactivate/{ref}', name: 'users_desactivate', methods: ['OPTIONS', 'GET'])]
+    // isGranted admin is done in service
     public function desactivate(string $ref): JsonResponse
     {
         $users = $this->usersService->desactivate($ref, $this->getUser());
@@ -92,6 +102,7 @@ class UsersController extends AbstractController
     }
 
     #[Route('/{ref}', name: 'users_detail', methods: ['OPTIONS', 'GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function detail(string $ref): JsonResponse
     {
         $users = $this->usersService->findByExceptCurrent($ref, $this->getUser());
@@ -100,6 +111,7 @@ class UsersController extends AbstractController
     }
 
     #[Route('/resend-confirmation/{ref}', name: 'users_resend-confirmation', methods: ['OPTIONS', 'GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function resendConfirmation(string $ref): JsonResponse
     {
         $users = $this->usersService->resendMailNewUser($ref);

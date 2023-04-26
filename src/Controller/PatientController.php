@@ -58,10 +58,10 @@ class PatientController extends AbstractController
     }
 
     #[Route('/{ref}', name: 'patient_show', methods: ['OPTIONS', 'GET'])]
-    public function show(string $ref): Response
+    public function show(string $ref): JsonResponse
     {
         $patients = $this->service->findByRef($ref);
 
-        return new Response(json_encode($patients, JSON_UNESCAPED_UNICODE), 200);
+        return new JsonResponse($patients, $patients['status']);
     }
 }

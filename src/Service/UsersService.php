@@ -263,6 +263,19 @@ class UsersService extends AbstractRestService {
         return $usersSerialized;*/
     }
 
+    public function findAllLight(Users $currentUser): array {
+        $users = $this->repository->findAll();
+        $ret = [];
+
+        foreach($users as $user) {
+            if ($user->getId() !== $currentUser->getId()) {
+                $ret[] = $user->jsonSerializeUltraLight();
+            }
+        }
+
+        return $ret;
+    }
+
     /**
      * @param int $id
      * @param Users $user

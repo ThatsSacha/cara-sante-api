@@ -57,25 +57,15 @@ class PatientService extends AbstractRestService {
         $patient = $this->repository->findOneBy(array(
             'ref' => $ref
         ));
-        $patientToReturn = [];
+        $ret = ['status' => 404];
 
         if ($patient !== null) {
-            $patientToReturn = $patient->jsonSerialize();
+            $ret = $patient->jsonSerialize();
 
-            foreach($patientToReturn['detectionTest'] as $i => $detectionTest) {
-                $detectionTestMonth = date_format($detectionTest['testedAt'], 'm');
-                $doctorLastName = $detectionTest['doctorLastName'];
-
-                // To not load antigenic test from September for M RABET doctor
-                /*if ($doctorLastName === 'M RABET' && $detectionTestMonth === '09') {
-                    unset($patientToReturn['detectionTest'][$i]);
-                }*/
-            }
-
-            $patientToReturn['detectionTest'] = array_values($patientToReturn['detectionTest']);
+            $ret['status'] = 200;
         }
 
-        return $patientToReturn;
+        return $ret;
     }
 
     /**

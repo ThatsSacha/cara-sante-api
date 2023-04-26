@@ -187,9 +187,33 @@ class DetectionTestService extends AbstractRestService {
         $detectionTest = $this->getByRef($ref);
 
         if (!$detectionTest->getIsInvoiced()) {
+            if ($data['alreadyInvoicedBy'] !== null && $data['isInvoicedOnAmelipro']) {
+                return array(
+                    'status' => 400,
+                    'message' => 'Vous ne pouvez pas facturer un test déjà facturé par un autre prestataire'
+                );
+            }
+
+            $userId = $data['alreadyInvoicedBy'];
+            $userHaveInvoiced = null;
+            
+            if ($userId) {
+                $userHaveInvoiced = $this->emi->getRepository(Users::class)->findOneBy(array(
+                    'id' => $userId
+                ));
+    
+                if ($userHaveInvoiced === null) {
+                    return array(
+                        'status' => 400,
+                        'message' => 'L\'utilisateur sélectionné n\'existe pas'
+                    );
+                }
+            }
+
             $detectionTest->setIsInvoiced($data['isInvoiced']);
             $detectionTest->setFilledAt($data['filledAt']);
             $detectionTest->setIsInvoicedOnAmelipro($data['isInvoicedOnAmelipro']);
+            $detectionTest->setAlreadyInvoicedBy($userHaveInvoiced);
             $detectionTest->setUser($user);
 
             $this->emi->persist($detectionTest);
@@ -204,6 +228,7 @@ class DetectionTestService extends AbstractRestService {
                     if ($itemDate === $detectionTestFillingDate) {
                         $item->setIsInvoiced($data['isInvoiced']);
                         $item->setFilledAt($data['filledAt']);
+                        $detectionTest->setIsInvoicedOnAmelipro($data['isInvoicedOnAmelipro']);
                         $item->setUser($user);
 
                         $this->emi->persist($item);

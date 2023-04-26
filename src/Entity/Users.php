@@ -135,7 +135,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'desactivatedBy' => $this->getDesactivatedBy() === null ? null : $this->getDesactivatedBy()->jsonSerializeLight(),
             'lastLoginFrench' => $this->getLastLogin() !== null ? $lastLoginFrench : null,
             'detectionTests' => $this->getDetectionTestsSerialized(),
-            'totalInvoiced' => $this->calculateTotalInvoiced()
+            'totalInvoiced' => $this->calculateTotalInvoiced(),
+            'fullName' => $this->getFirstName() . ' ' . $this->getLastName()
         );
     }
 
@@ -152,7 +153,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
             'isFirstConnection' => $this->getIsFirstConnection(),
             'isDesactivated' => $this->getIsDesactivated(),
             'desactivatedAt' => $this->getDesactivatedAt(),
-            'lastLoginFrench' => $this->getLastLogin() !== null ? $lastLoginFrench : null
+            'lastLoginFrench' => $this->getLastLogin() !== null ? $lastLoginFrench : null,
+            'fullName' => $this->getFirstName() . ' ' . $this->getLastName()
+        );
+    }
+
+    public function jsonSerializeUltraLight(): array {
+        return array(
+            'id' => $this->getId(),
+            'ref' => $this->getRef(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'fullName' => $this->getFirstName() . ' ' . $this->getLastName()
         );
     }
 
