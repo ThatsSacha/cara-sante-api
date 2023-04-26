@@ -10,13 +10,13 @@ use Symfony\Component\Mime\Address;
 class MailerService {
     private MailerInterface $mailer;
 
-    public function __construct(MailerInterface $mailer) {
+    public function __construct(private string $medicalCenter, MailerInterface $mailer) {
         $this->mailer = $mailer;
     }
 
     public function sendMail(string $sendTo, string $subject, string $htmlTemplate, ?string $file = null, ?string $replyTo = null) {
         $mail = (new Email())
-        ->from(new Address('no-reply@liora.app', 'Liora | Cara Santé'))
+        ->from(new Address('no-reply@liora.app', 'Liora | Cara Santé '. $this->medicalCenter))
         ->to($sendTo)
         ->subject($subject)
         ->html($htmlTemplate);

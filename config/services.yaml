@@ -31,3 +31,6 @@ services:
     App\Service\PatientService:
         arguments:
         - '%env(MEDICAL_CENTER)%'
+    App\Service\MailerService:
+        arguments:
+        - '%env(MEDICAL_CENTER)%'
