@@ -4,14 +4,15 @@ namespace App\Service;
 
 use Exception;
 use App\Entity\Users;
+use IntlDateFormatter;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use function Sodium\randombytes_uniform;
 use Doctrine\ORM\Query\AST\Functions\ConcatFunction;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
-use function Sodium\randombytes_uniform;
 
 class UsersService extends AbstractRestService {
     private $passwordHasher;

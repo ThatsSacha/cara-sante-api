@@ -75,4 +75,46 @@ class UserExportRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function exportDataFrom(int $userId): array {
+        $db = $this->getEntityManager()->getConnection();
+
+        $query = 'SELECT
+                dt.tested_at,
+                dt.is_invoiced,
+                dt.filled_at,
+                dt.ref,
+                dt.is_negative,
+                dt.doctor_first_name,
+                dt.doctor_last_name,
+                dt.is_invoiced_on_amelipro,
+                p.first_name AS patient_first_name,
+                p.last_name AS patient_last_name,
+                p.birth AS patient_birth_date,
+                p.phone AS patient_phone,
+                p.mail AS patient_mail,
+                p.nir AS patient_nir,
+                p.street AS patient_street,
+                p.zip AS patient_zip,
+                p.city AS patient_city,
+                u.first_name AS user_first_name,
+                u.last_name AS user_last_name,
+                u2.first_name AS already_invoiced_by_first_name,
+                u2.last_name AS already_invoiced_by_last_name
+            FROM detection_test AS dt
+            LEFT JOIN patient AS p
+                ON dt.patient_id = p.id
+            LEFT JOIN users AS u
+                ON dt.user_id = u.id
+            LEFT JOIN users AS u2
+                ON dt.already_invoiced_by_id = u2.id
+            WHERE dt.user_id = :val
+        ';
+
+        $query = $db->prepare($query);
+        $query->bindValue('val', $userId);
+        $response = $query->executeQuery();
+        
+        return $response->fetchAll();
+    }
 }

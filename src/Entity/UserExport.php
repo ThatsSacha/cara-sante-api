@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\UserExportRepository;
+use IntlDateFormatter;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserExportRepository;
 
 /**
  * @ORM\Entity(repositoryClass=UserExportRepository::class)
@@ -38,6 +39,18 @@ class UserExport
      * @ORM\Column(type="text")
      */
     private $filePath;
+
+    public function jsonSerialize(): array {
+        $requestedAt = $this->getRequestedAt() === null ? : IntlDateFormatter::formatObject($this->getRequestedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+
+        return array(
+            'id' => $this->getId(),
+            'requestedBy' => $this->getRequestedBy()->jsonSerializeUltraLight(),
+            'dataFrom' => $this->getDataFrom()->jsonSerializeUltraLight(),
+            'requestedAt' => $requestedAt,
+            'filePath' => $this->getFilePath()
+        );
+    }
 
     public function getId(): ?int
     {
