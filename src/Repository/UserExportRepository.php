@@ -132,7 +132,7 @@ class UserExportRepository extends ServiceEntityRepository
             WHERE dt.user_id = :val AND dt.is_invoiced = 1
             ORDER BY month ASC
         ';
-
+        
         $query = $db->prepare($query);
         $query->bindValue('val', $userId);
         $response = $query->executeQuery();

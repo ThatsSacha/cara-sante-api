@@ -24,13 +24,13 @@ class UserExportService extends AbstractRestService {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
     }
 
-    public function requestExport(Request $request, string $userRef) {
+    public function requestExport(Request $request, Users $requestedBy, string $dataFrom) {
         if ($request->getContentType() === 'json') {
             $data = json_decode($request->getContent(), true);
         }
 
         $userRepository = $this->emi->getRepository(Users::class);
-        $user = $userRepository->findOneBy(['ref' => $userRef]);
+        $user = $userRepository->findOneBy(['ref' => $dataFrom]);
         
         if ($user !== null) {
             $fileName = $this->buildExportFileOf($user, $data);
@@ -38,7 +38,7 @@ class UserExportService extends AbstractRestService {
             $frenchMonth = ucfirst(IntlDateFormatter::formatObject($date, 'MMMM', 'fr'));
 
             $userExport = new UserExport();
-            $userExport->setRequestedBy($user)
+            $userExport->setRequestedBy($requestedBy)
                         ->setDataFrom($user)
                         ->setRequestedAt(new \DateTime())
                         ->setFileName($fileName)
@@ -141,22 +141,31 @@ class UserExportService extends AbstractRestService {
         );
     }
 
-    public function deleteExport($ref): array {
-        $userExport = $this->repository->findOneBy(['ref' => $ref]);
+    public function deleteExport(string $dataFrom, string $userRef): array {
+        $userExport = $this->repository->findOneBy(['ref' => $dataFrom]);
 
         if ($userExport !== null) {
-            try {
-                unlink('../var/exports/' . $userExport->getFileName());
-            } catch(Exception $e) {
-                $e;
+            $canDelete = $userExport->getDataFrom()->getRef() === $userRef || $userExport->getRequestedBy()->getRef() === $userRef;
+
+            if ($canDelete) {
+                try {
+                    unlink('../var/exports/' . $userExport->getFileName());
+                } catch(Exception $e) {
+                    $e;
+                }
+    
+                $this->emi->remove($userExport);
+                $this->emi->flush();
+    
+                return array(
+                    'status' => 200,
+                    'message' => 'L\'export a bien été supprimé.'
+                );
             }
-
-            $this->emi->remove($userExport);
-            $this->emi->flush();
-
+            
             return array(
-                'status' => 200,
-                'message' => 'L\'export a bien été supprimé.'
+                'status' => 401,
+                'message' => 'Vous n\'avez pas les droits pour supprimer cet export.'
             );
         }
 
@@ -195,7 +204,7 @@ class UserExportService extends AbstractRestService {
 
         if ($user !== null) {
             $userExports = $this->repository->findAvailableMonths($user->getId());
-
+            
             foreach($userExports as $i => $userExport) {
                 $date = date_create('01-' . $userExport['month'] . '-2023');
                 $frenchMonth = ucfirst(IntlDateFormatter::formatObject($date, 'MMMM', 'fr'));
