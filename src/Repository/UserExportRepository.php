@@ -76,7 +76,7 @@ class UserExportRepository extends ServiceEntityRepository
     }
     */
 
-    public function exportDataFrom(int $userId): array {
+    public function exportDataFrom(int $userId, string $startDate, string $endDate): array {
         $db = $this->getEntityManager()->getConnection();
 
         $query = 'SELECT
@@ -109,6 +109,28 @@ class UserExportRepository extends ServiceEntityRepository
             LEFT JOIN users AS u2
                 ON dt.already_invoiced_by_id = u2.id
             WHERE dt.user_id = :val
+            AND dt.is_invoiced = 1
+            AND dt.filled_at BETWEEN :startDate AND :endDate
+        ';
+
+        $query = $db->prepare($query);
+        $query->bindValue('val', $userId);
+        $query->bindValue('startDate', $startDate);
+        $query->bindValue('endDate', $endDate);
+        $response = $query->executeQuery();
+        
+        return $response->fetchAll();
+    }
+
+    public function findAvailableMonths(int $userId): array {
+        $db = $this->getEntityManager()->getConnection();
+
+        $query = 'SELECT DISTINCT
+                MONTH(dt.filled_at) AS month,
+                YEAR(dt.filled_at) AS year
+            FROM detection_test AS dt
+            WHERE dt.user_id = :val AND dt.is_invoiced = 1
+            ORDER BY month ASC
         ';
 
         $query = $db->prepare($query);

@@ -38,17 +38,28 @@ class UserExport
     /**
      * @ORM\Column(type="text")
      */
-    private $filePath;
+    private $fileName;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ref;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $requestedPeriod;
 
     public function jsonSerialize(): array {
         $requestedAt = $this->getRequestedAt() === null ? : IntlDateFormatter::formatObject($this->getRequestedAt(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
 
         return array(
-            'id' => $this->getId(),
+            'ref' => $this->getRef(),
             'requestedBy' => $this->getRequestedBy()->jsonSerializeUltraLight(),
             'dataFrom' => $this->getDataFrom()->jsonSerializeUltraLight(),
             'requestedAt' => $requestedAt,
-            'filePath' => $this->getFilePath()
+            'fileName' => $this->getFileName(),
+            'requestedPeriod' => $this->getRequestedPeriod()
         );
     }
 
@@ -93,14 +104,38 @@ class UserExport
         return $this;
     }
 
-    public function getFilePath(): ?string
+    public function getFileName(): ?string
     {
-        return $this->filePath;
+        return $this->fileName;
     }
 
-    public function setFilePath(string $filePath): self
+    public function setFileName(string $fileName): self
     {
-        $this->filePath = $filePath;
+        $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    public function getRef(): ?string
+    {
+        return $this->ref;
+    }
+
+    public function setRef(string $ref): self
+    {
+        $this->ref = $ref;
+
+        return $this;
+    }
+
+    public function getRequestedPeriod(): ?string
+    {
+        return $this->requestedPeriod;
+    }
+
+    public function setRequestedPeriod(string $requestedPeriod): self
+    {
+        $this->requestedPeriod = $requestedPeriod;
 
         return $this;
     }

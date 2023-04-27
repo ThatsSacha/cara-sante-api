@@ -2,11 +2,15 @@
 
 namespace App\Service;
 
-use App\Entity\UserExport;
+use Exception;
 use App\Entity\Users;
 use IntlDateFormatter;
+use App\Entity\UserExport;
 use App\Repository\UserExportRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -20,17 +24,26 @@ class UserExportService extends AbstractRestService {
         parent::__construct($repository, $emi, $denormalizer, $normalizer);
     }
 
-    public function requestExport(string $userRef) {
+    public function requestExport(Request $request, string $userRef) {
+        if ($request->getContentType() === 'json') {
+            $data = json_decode($request->getContent(), true);
+        }
+
         $userRepository = $this->emi->getRepository(Users::class);
         $user = $userRepository->findOneBy(['ref' => $userRef]);
         
         if ($user !== null) {
-            $filePath = $this->buildExportFileOf($user);
+            $fileName = $this->buildExportFileOf($user, $data);
+            $date = date_create('01-' . $data['month'] . '-' . $data['year']);
+            $frenchMonth = ucfirst(IntlDateFormatter::formatObject($date, 'MMMM', 'fr'));
+
             $userExport = new UserExport();
             $userExport->setRequestedBy($user)
                         ->setDataFrom($user)
                         ->setRequestedAt(new \DateTime())
-                        ->setFilePath($filePath)
+                        ->setFileName($fileName)
+                        ->setRef(uniqid())
+                        ->setRequestedPeriod($frenchMonth . ' ' . $data['year'])
             ;
 
             $this->emi->persist($userExport);
@@ -51,10 +64,13 @@ class UserExportService extends AbstractRestService {
     /**
      * @param Users $user
      * 
-     * @return string the file path
+     * @return string the file name
      */
-    private function buildExportFileOf(Users $user): string {
-        $detectionTests = $this->repository->exportDataFrom($user->getId());
+    private function buildExportFileOf(Users $user, array $data): string {
+        $startDate = $data['year'] . '-' . $data['month'] . '-01';
+        // Get the last day of the month
+        $endDate = date('Y-m-t', strtotime($startDate));
+        $detectionTests = $this->repository->exportDataFrom($user->getId(), $startDate, $endDate);
 
         $csvHeader = array(
             'Testé le',
@@ -98,7 +114,7 @@ class UserExportService extends AbstractRestService {
         }
 
         fclose($fp);
-        return $filePath;
+        return $fileName;
     }
 
     public function getExportsOf(string $userRef): array {
@@ -106,7 +122,7 @@ class UserExportService extends AbstractRestService {
         $user = $userRepository->findOneBy(['ref' => $userRef]);
         
         if ($user !== null) {
-            $userExports = $this->repository->findBy(['dataFrom' => $user->getId()]);
+            $userExports = $this->repository->findBy(['dataFrom' => $user->getId()], ['requestedAt' => 'DESC']);
             $tmp = [];
 
             foreach($userExports as $userExport) {
@@ -116,6 +132,79 @@ class UserExportService extends AbstractRestService {
             return array(
                 'status' => 200,
                 'object' => $tmp
+            );
+        }
+
+        return array(
+            'status' => 400,
+            'message' => 'Cet utilisateur est introuvable.'
+        );
+    }
+
+    public function deleteExport($ref): array {
+        $userExport = $this->repository->findOneBy(['ref' => $ref]);
+
+        if ($userExport !== null) {
+            try {
+                unlink('../var/exports/' . $userExport->getFileName());
+            } catch(Exception $e) {
+                $e;
+            }
+
+            $this->emi->remove($userExport);
+            $this->emi->flush();
+
+            return array(
+                'status' => 200,
+                'message' => 'L\'export a bien été supprimé.'
+            );
+        }
+
+        return array(
+            'status' => 400,
+            'message' => 'Cet export est introuvable.'
+        );
+    }
+
+    public function downloadExport(string $exportRef, string $userRef): BinaryFileResponse|JsonResponse {
+        $userExport = $this->repository->findOneBy(['ref' => $exportRef]);
+        $canDownload = $userExport->getDataFrom()->getRef() === $userRef || $userExport->getRequestedBy()->getRef() === $userRef;
+
+        if ($userExport !== null && $canDownload) {
+            $file = '../var/exports/' . $userExport->getFileName();
+
+            return new BinaryFileResponse($file, 200, [
+                'Content-Type' => 'text/csv; charset=utf-8',
+                'Content-Disposition' => 'attachment; filename="' . $userExport->getFileName() . '"'
+            ]);
+        }
+
+        return new JsonResponse(array(
+            'status' => 400,
+            'message' => 'Cet export est introuvable.'
+        ), 400);
+    }
+
+    /**
+     * @param string $userRef
+     * 
+     * @return array
+     */
+    public function getAvailableMonth(string $userRef): array {
+        $user = $this->emi->getRepository(Users::class)->findOneBy(['ref' => $userRef]);
+
+        if ($user !== null) {
+            $userExports = $this->repository->findAvailableMonths($user->getId());
+
+            foreach($userExports as $i => $userExport) {
+                $date = date_create('01-' . $userExport['month'] . '-2023');
+                $frenchMonth = ucfirst(IntlDateFormatter::formatObject($date, 'MMMM', 'fr'));
+                $userExports[$i]['text'] = $frenchMonth . ' ' . $userExport['year'];
+            }
+
+            return array(
+                'status' => 200,
+                'object' => $userExports
             );
         }
 
