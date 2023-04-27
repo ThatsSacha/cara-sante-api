@@ -109,10 +109,16 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $lastLogin;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserExport::class, mappedBy="dataFrom", orphanRemoval=true)
+     */
+    private $userExports;
+
     public function __construct()
     {
         $this->detectionTests = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->userExports = new ArrayCollection();
     }
 
     public function jsonSerialize(): array {
@@ -488,5 +494,35 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $invoiced;
+    }
+
+    /**
+     * @return Collection<int, UserExport>
+     */
+    public function getUserExports(): Collection
+    {
+        return $this->userExports;
+    }
+
+    public function addUserExport(UserExport $userExport): self
+    {
+        if (!$this->userExports->contains($userExport)) {
+            $this->userExports[] = $userExport;
+            $userExport->setDataFrom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserExport(UserExport $userExport): self
+    {
+        if ($this->userExports->removeElement($userExport)) {
+            // set the owning side to null (unless already changed)
+            if ($userExport->getDataFrom() === $this) {
+                $userExport->setDataFrom(null);
+            }
+        }
+
+        return $this;
     }
 }
