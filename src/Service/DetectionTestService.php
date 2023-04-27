@@ -365,10 +365,11 @@ class DetectionTestService extends AbstractRestService {
                     $detectionTest = $detectionTest->jsonSerialize();
                 }
                 
-                $filledAt = IntlDateFormatter::formatObject($detectionTest['filledAt'], IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+                $filledAt = $detectionTest['filledAt']->format('d-m-Y');
                 $detectionTest['filledAt'] = $filledAt;
                 
                 $detectionTestsByDate[$detectionTest['filledAt']]['object'][] = $detectionTest;
+                $detectionTestsByDate[$detectionTest['filledAt']]['dateText'] = 'Le ' . $filledAt;
             }
         }
 
