@@ -67,23 +67,33 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
     */
 
     public function findAllWithDetectionTestCount($user) {
-        $userId = $user->getId();
         $db = $this->getEntityManager()->getConnection();
-
-        $query = "SELECT COUNT(*) AS detection_test_count FROM detection_test WHERE user_id != :val GROUP BY user_id";
-        $query = $db->prepare($query);
-        $query->bindValue('val', $userId);
-        $response = $query->executeQuery();
-        $detectionTestCount = $response->fetchAll()[0];
         
-        $query = 'SELECT first_name AS firstName, last_name as lastName, email AS mail, phone, last_login AS lastLogin, is_first_connection AS isFirstConnection, is_desactivated AS isDesactivated, ref FROM users WHERE id != :val';
+        $query = 'SELECT id, first_name AS firstName, last_name as lastName, email AS mail, phone, last_login AS lastLogin, is_first_connection AS isFirstConnection, is_desactivated AS isDesactivated, ref FROM users WHERE id != :val';
+        $query = $db->prepare($query);
+        $query->bindValue('val', $user->getId());
+        $response = $query->executeQuery();
+        $users = $response->fetchAll();
+        $tmp = [];
+
+        foreach ($users as $key => $user) {
+            $detectionTestCount = $this->countDetectionTestFor($user['id']);
+            $tmp[] = $user;
+            $tmp[$key]['totalInvoiced'] = $detectionTestCount['detection_test_count'];
+            $tmp[$key]['lastLoginFrench'] = $user['lastLogin'] === null ? : IntlDateFormatter::formatObject(date_create($user['lastLogin']), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
+        }
+
+        return $tmp;
+    }
+
+    public function countDetectionTestFor(int $userId): array {
+        $db = $this->getEntityManager()->getConnection();
+        $query = "SELECT COUNT(*) AS detection_test_count FROM detection_test WHERE user_id = :val";
+
         $query = $db->prepare($query);
         $query->bindValue('val', $userId);
         $response = $query->executeQuery();
-        $user = $response->fetchAll();
-        $user[0]['totalInvoiced'] = $detectionTestCount['detection_test_count'];
-        $user[0]['lastLoginFrench'] = $user[0]['lastLogin'] === null ? : IntlDateFormatter::formatObject(date_create($user[0]['lastLogin']), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
 
-        return $user;
+        return $response->fetchAll()[0];
     }
 }
