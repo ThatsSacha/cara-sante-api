@@ -100,4 +100,28 @@ class UserExportService extends AbstractRestService {
         fclose($fp);
         return $filePath;
     }
+
+    public function getExportsOf(string $userRef): array {
+        $userRepository = $this->emi->getRepository(Users::class);
+        $user = $userRepository->findOneBy(['ref' => $userRef]);
+        
+        if ($user !== null) {
+            $userExports = $this->repository->findBy(['dataFrom' => $user->getId()]);
+            $tmp = [];
+
+            foreach($userExports as $userExport) {
+                $tmp[] = $userExport->jsonSerialize();
+            }
+
+            return array(
+                'status' => 200,
+                'object' => $tmp
+            );
+        }
+
+        return array(
+            'status' => 400,
+            'message' => 'Cet utilisateur est introuvable.'
+        );
+    }
 }

@@ -25,4 +25,12 @@ class UsersExportController extends AbstractController
 
         return new JsonResponse($users, $users['status']);
     }
+
+    #[Route('', name: 'user-export-me', methods: ['OPTIONS', 'GET'])]
+    public function getExports(): JsonResponse
+    {
+        $users = $this->service->getExportsOf($this->getUser()->getRef());
+
+        return new JsonResponse($users, $users['status']);
+    }
 }
