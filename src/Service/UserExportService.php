@@ -72,6 +72,10 @@ class UserExportService extends AbstractRestService {
         $endDate = date('Y-m-t', strtotime($startDate));
         $detectionTests = $this->repository->exportDataFrom($user->getId(), $startDate, $endDate);
 
+        if (is_dir('../var/exports') === false) {
+            mkdir('../var/exports');
+        }
+
         $csvHeader = array(
             'Testé le',
             'Saisit le',
