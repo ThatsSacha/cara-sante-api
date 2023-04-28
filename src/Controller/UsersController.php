@@ -47,6 +47,14 @@ class UsersController extends AbstractController
         return new JsonResponse($users, $users['status']);
     }
 
+    #[Route('/earning-chart', name: 'users_earning-chart', methods: ['OPTIONS', 'GET'])]
+    public function earningChart(): JsonResponse
+    {
+        $users = $this->usersService->getEarningChart($this->getUser());
+
+        return new JsonResponse($users, $users['status']);
+    }
+
     #[Route('/get-user-stats', name: 'users_get-user-stats', methods: ['OPTIONS', 'GET'])]
     public function getUserStats(): JsonResponse
     {

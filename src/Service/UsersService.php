@@ -2,17 +2,18 @@
 
 namespace App\Service;
 
-use App\Entity\UserExport;
 use Exception;
 use App\Entity\Users;
-use App\Repository\UserExportRepository;
 use IntlDateFormatter;
+use App\Entity\UserExport;
+use App\Entity\DetectionTest;
 use App\Repository\UsersRepository;
+use App\Repository\UserExportRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use function Sodium\randombytes_uniform;
 use Doctrine\ORM\Query\AST\Functions\ConcatFunction;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -601,5 +602,54 @@ class UsersService extends AbstractRestService {
             'month' => $frenchMonth
         );
 
+    }
+
+    public function getEarningChart(Users $user): array {
+        $detectionTests = $user->getDetectionTests();
+        $detectionTestRepo = $this->emi->getRepository(DetectionTest::class);
+
+        $detectionTests = $detectionTestRepo->findBy(array(
+            'user' => $user->getId()
+        ), array(
+            'filledAt' => 'ASC'
+        ));
+
+        $dataset = $this->calculateEarningPerDay($detectionTests);
+            
+        return array(
+            'status' => 200,
+            'labels' => array_values($dataset['labels']),
+            'data' => array_values($dataset['data'])
+        );
+    }
+
+    private function calculateEarningPerDay(array $detectionTests): array {
+        $tmpEarningByDay = [];
+        $tmpLabelDay = [];
+
+        foreach($detectionTests as $detectionTest) {
+            $filledAt = $detectionTest->getFilledAt();
+            $isInvoicedOnAmeliPro = $detectionTest->getIsInvoicedOnAmelipro();
+            $alreadyInvoicedBy = $detectionTest->getAlreadyInvoicedBy()?->getFirstName();
+            $earning = 0;
+
+            if (!$isInvoicedOnAmeliPro && $alreadyInvoicedBy === null) {
+                $key = strtotime($filledAt->format('Y-m-d'));
+                $label = IntlDateFormatter::formatObject($filledAt, 'dd MMMM', 'fr');
+
+                if (!array_key_exists($key, $tmpEarningByDay)) {
+                    $tmpEarningByDay[$key] = 0;
+                }
+
+                $earning += $tmpEarningByDay[$key] + 3;
+                $tmpEarningByDay[$key] = $earning;
+                $tmpLabelDay[$key] = $label;
+            }
+        }
+
+        return array(
+            'labels' => $tmpLabelDay,
+            'data' => $tmpEarningByDay
+        );
     }
 }
