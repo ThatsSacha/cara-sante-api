@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\UserExport;
 use Exception;
 use App\Entity\Users;
+use App\Repository\UserExportRepository;
 use IntlDateFormatter;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -570,5 +572,34 @@ class UsersService extends AbstractRestService {
             $error = implode(', ', $errors);
             throw new Exception($error, 400);
         }
+    }
+
+    public function calculateEarning(Users $user) {
+        $startDate = date_create()->format('Y-m-01');
+        // Get the last day of the month
+        $endDate = date('Y-m-t', strtotime($startDate));
+        $frenchMonth = IntlDateFormatter::formatObject(date_create($startDate), 'MMMM', 'fr');
+
+        $earning = 0;
+        
+        // get UserExportRepo
+        $userExportRepo = $this->emi->getRepository(UserExport::class);
+        $detectionTests = $userExportRepo->exportDataFrom($user->getId(), $startDate, $endDate);
+
+        foreach($detectionTests as $detectionTest) {
+            $isInvoicedOnAmeliPro = $detectionTest['is_invoiced_on_amelipro'];
+            $alreadyInvoicedBy = $detectionTest['already_invoiced_by_first_name'];
+
+            if (!$isInvoicedOnAmeliPro && $alreadyInvoicedBy === null) {
+                $earning += 3;
+            }
+        }
+
+        return array(
+            'status' => 200,
+            'earning' => $earning,
+            'month' => $frenchMonth
+        );
+
     }
 }
