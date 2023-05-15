@@ -81,6 +81,8 @@ class Patient
     }
 
     public function jsonSerialize(): array {
+        $birth = $this->getBirth() ? IntlDateFormatter::formatObject($this->getBirth(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr') : null;
+
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
@@ -88,7 +90,7 @@ class Patient
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
             'phone' => $this->getPhone(),
-            'birth' => IntlDateFormatter::formatObject($this->getBirth(), 'dd/MM/yyyy', 'fr'),
+            'birth' => $birth,
             'street' => $this->getStreet(),
             'zip' => $this->getZip(),
             'city' => $this->getCity(),
@@ -98,6 +100,8 @@ class Patient
     }
 
     public function jsonSerializeLight(): array {
+        $birth = $this->getBirth() ? IntlDateFormatter::formatObject($this->getBirth(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr') : null;
+
         return array(
             'id' => $this->getId(),
             'ref' => $this->getRef(),
@@ -105,7 +109,7 @@ class Patient
             'lastName' => $this->getLastName(),
             'mail' => $this->getMail(),
             'phone' => $this->getPhone(),
-            'birth' => IntlDateFormatter::formatObject($this->getBirth(), IntlDateFormatter::RELATIVE_MEDIUM, 'fr'),
+            'birth' => $birth,
             'street' => $this->getStreet(),
             'zip' => $this->getZip(),
             'city' => $this->getCity(),
