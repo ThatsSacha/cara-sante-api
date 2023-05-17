@@ -96,7 +96,7 @@ class UserExportService extends AbstractRestService {
         $fp = fopen($filePath, 'wb');
         fputs($fp, implode(';', $csvHeader));
 
-        foreach($detectionTests as $detectionTest) {
+        foreach($detectionTests as $detectionTest) { 
             $tmp = [];
 
             $tmp[1] = IntlDateFormatter::formatObject(date_create($detectionTest['tested_at']), 'd MMMM y', 'fr');
