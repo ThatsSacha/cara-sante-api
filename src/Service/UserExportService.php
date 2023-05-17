@@ -99,17 +99,18 @@ class UserExportService extends AbstractRestService {
         foreach($detectionTests as $detectionTest) {
             $tmp = [];
 
-            $tmp[1] = IntlDateFormatter::formatObject(date_create($detectionTest['tested_at']), IntlDateFormatter::MEDIUM, 'fr');
-            $tmp[2] = IntlDateFormatter::formatObject(date_create($detectionTest['filled_at']), IntlDateFormatter::MEDIUM, 'fr');
+            $tmp[1] = IntlDateFormatter::formatObject(date_create($detectionTest['tested_at']), 'd MMMM y', 'fr');
+            $tmp[2] = IntlDateFormatter::formatObject(date_create($detectionTest['filled_at']), 'd MMMM y', 'fr');
             $tmp[3] = $detectionTest['is_invoiced'] ? 'Oui' : 'Non';
             $tmp[4] = $detectionTest['ref'];
             $tmp[5] = $detectionTest['is_negative'] ? 'Négatif' : 'Positif';
             $tmp[6] = $detectionTest['doctor_first_name'] . ' ' . $detectionTest['doctor_last_name'];
             $tmp[7] = $detectionTest['is_invoiced_on_amelipro'] ? 'Oui' : 'Non';
             $tmp[8] = $detectionTest['patient_first_name'] . ' ' . $detectionTest['patient_last_name'];
-            $tmp[9] = IntlDateFormatter::formatObject(date_create($detectionTest['patient_birth_date']), IntlDateFormatter::MEDIUM, 'fr');
+            $tmp[9] = IntlDateFormatter::formatObject(date_create($detectionTest['patient_birth_date']), 'd MMMM y', 'fr');
             $tmp[10] = $detectionTest['patient_nir'];
-            $tmp[11] = $detectionTest['patient_street'] . ' ' . $detectionTest['patient_zip'] . ' ' . $detectionTest['patient_city'];
+            $address = $detectionTest['patient_street'] . ' ' . $detectionTest['patient_zip'] . ' ' . $detectionTest['patient_city'];
+            $tmp[11] = str_replace(array("\r", "\n"), '', $address);
             $tmp[12] = $detectionTest['user_first_name'] . ' ' . $detectionTest['user_last_name'];
             $tmp[13] = $detectionTest['already_invoiced_by_first_name'] === null ? 'Aucun' : $detectionTest['already_invoiced_by_first_name'] . ' ' . $detectionTest['already_invoiced_by_last_name'];
 
