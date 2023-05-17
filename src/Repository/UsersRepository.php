@@ -80,15 +80,18 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
             $detectionTestCount = $this->countDetectionTestFor($user['id']);
             $tmp[] = $user;
             $tmp[$key]['totalInvoiced'] = $detectionTestCount['detection_test_count'];
+            $tmp[$key]['invoicedWithLiora'] = $this->countDetectionTestFor($user['id'], ['key' => 'is_invoiced_on_amelipro', 'value' => 0])['detection_test_count'];
+            $tmp[$key]['invoicedWithAmelipro'] = $this->countDetectionTestFor($user['id'], ['key' => 'is_invoiced_on_amelipro', 'value' => 1])['detection_test_count'];
             $tmp[$key]['lastLoginFrench'] = $user['lastLogin'] === null ? : IntlDateFormatter::formatObject(date_create($user['lastLogin']), IntlDateFormatter::RELATIVE_MEDIUM, 'fr');
         }
 
         return $tmp;
     }
 
-    public function countDetectionTestFor(int $userId): array {
+    public function countDetectionTestFor(int $userId, ?array $where = null): array {
+        $clause = $where !== null ? "AND " . $where['key'] . " = " . $where['value'] : "";
         $db = $this->getEntityManager()->getConnection();
-        $query = "SELECT COUNT(*) AS detection_test_count FROM detection_test WHERE user_id = :val";
+        $query = "SELECT COUNT(*) AS detection_test_count FROM detection_test WHERE user_id = :val $clause";
 
         $query = $db->prepare($query);
         $query->bindValue('val', $userId);

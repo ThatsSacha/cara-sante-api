@@ -254,17 +254,7 @@ class UsersService extends AbstractRestService {
      * @return array
      */
     public function findAllExceptCurrent(Users $currentUser): array {
-        return $this->repository->findAllWithDetectionTestCount($currentUser);
-        /*dd($users);
-        $usersSerialized = [];
-
-        foreach($users as $user) {
-            if ($user->getEmail() !== $currentUser->getEmail()) {
-                $usersSerialized[] = $user->jsonSerialize();
-            }
-        }
-
-        return $usersSerialized;*/
+       return $this->repository->findAllWithDetectionTestCount($currentUser);
     }
 
     public function findAllLight(Users $currentUser): array {
