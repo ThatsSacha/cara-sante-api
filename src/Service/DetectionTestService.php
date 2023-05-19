@@ -135,7 +135,8 @@ class DetectionTestService extends AbstractRestService {
         $detectionTestsSerialized = [];
 
         $detectionTests = $this->repository->findBy(array(
-            'isInvoiced' => false
+            'isInvoiced' => false,
+            'filledAt' => null
         ), null, $limit);
 
         foreach($detectionTests as $detectionTest) {
