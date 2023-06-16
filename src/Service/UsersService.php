@@ -582,7 +582,7 @@ class UsersService extends AbstractRestService {
             $alreadyInvoicedBy = $detectionTest['already_invoiced_by_first_name'];
 
             if (!$isInvoicedOnAmeliPro && $alreadyInvoicedBy === null) {
-                $earning += 3;
+                $earning += 1.5;
             }
         }
 
